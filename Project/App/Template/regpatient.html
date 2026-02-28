@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Intake | MedSaathi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0f766e; /* Professional Teal */
+            --primary-dark: #134e4a;
+            --secondary: #64748b;
+            --bg-body: #f1f5f9;
+            --bg-card: #ffffff;
+            --border: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --error: #be123c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: var(--bg-card);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        /* Header Enhancement */
+        .form-header {
+            padding: 3rem 2.5rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .form-header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.025em;
+        }
+
+        .form-header p {
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+            font-size: 0.95rem;
+        }
+
+        .form-content {
+            padding: 2.5rem;
+        }
+
+        /* Section Hierarchy */
+        .form-section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+            margin-left: 1rem;
+        }
+
+        /* Responsive Grid */
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        /* Inputs & Labels */
+        label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            color: #334155;
+        }
+
+        .required {
+            color: var(--error);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.65rem 0.85rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            color: var(--text-main);
+            transition: all 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1);
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        /* Information Callout Box */
+        .info-box {
+            background-color: #f8fafc;
+            border: 1px solid var(--border);
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Terms & Conditions Section */
+        .terms-section {
+            padding: 1.25rem;
+            background: #f1f5f9;
+            border-radius: 8px;
+            margin-top: 2rem;
+        }
+
+        .terms-section label {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            font-weight: 400;
+            cursor: pointer;
+            line-height: 1.4;
+        }
+
+        .terms-section input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            cursor: pointer;
+        }
+
+        /* Action Buttons */
+        .button-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        button {
+            padding: 0.75rem 1.75rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .btn-reset {
+            background: #ffffff;
+            color: var(--secondary);
+            border-color: var(--border);
+        }
+
+        .btn-reset:hover {
+            background: #f8fafc;
+            color: var(--text-main);
+        }
+
+        .btn-submit {
+            background: var(--primary);
+            color: #ffffff;
+        }
+
+        .btn-submit:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 4px 12px rgba(15, 118, 110, 0.2);
+        }
+
+        @media (max-width: 640px) {
+            .form-row { grid-template-columns: 1fr; }
+            .full-width { grid-column: auto; }
+            .form-content { padding: 1.5rem; }
+            .button-group { flex-direction: column-reverse; }
+            button { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header class="form-header">
+        <h1>Patient Registration</h1>
+        <p>Please provide your clinical and contact history to facilitate your care.</p>
+    </header>
+
+    <div class="form-content">
+        <form id="patientForm" onsubmit="handleSubmit(event)">
+            
+            <section class="form-section">
+                <h2 class="section-title">Identity & Demographics</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>First Name <span class="required">*</span></label>
+                        <input type="text" name="firstName" placeholder="e.g. Sarita" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name <span class="required">*</span></label>
+                        <input type="text" name="lastName" placeholder="e.g. Sharma" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Date of Birth <span class="required">*</span></label>
+                        <input type="date" name="dob" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Gender <span class="required">*</span></label>
+                        <select name="gender" required>
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                            <option value="undisclosed">Prefer not to say</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Blood Group</label>
+                        <select name="bloodGroup">
+                            <option value="">Select Type</option>
+                            <option value="A+">A+</option><option value="A-">A-</option>
+                            <option value="B+">B+</option><option value="B-">B-</option>
+                            <option value="O+">O+</option><option value="O-">O-</option>
+                            <option value="AB+">AB+</option><option value="AB-">AB-</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Marital Status</label>
+                        <select name="maritalStatus">
+                            <option value="">Select Status</option>
+                            <option value="single">Single</option>
+                            <option value="married">Married</option>
+                            <option value="divorced">Divorced</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <section class="form-section">
+                <h2 class="section-title">Communication Details</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Mobile Number <span class="required">*</span></label>
+                        <input type="tel" name="phone" placeholder="98XXXXXXXX" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address <span class="required">*</span></label>
+                        <input type="email" name="email" placeholder="name@example.com" required>
+                    </div>
+                </div>
+                <div class="form-group full-width" style="margin-bottom: 1.25rem;">
+                    <label>Residential Address <span class="required">*</span></label>
+                    <input type="text" name="address" placeholder="Street name, Ward no." required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>City <span class="required">*</span></label>
+                        <input type="text" name="city" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Postal Code</label>
+                        <input type="text" name="postalCode">
+                    </div>
+                </div>
+            </section>
+
+            <section class="form-section">
+                <h2 class="section-title">Medical History</h2>
+                <div class="info-box">
+                    <p style="font-size: 0.85rem; color: var(--secondary);">
+                        <strong>Note:</strong> This information helps our doctors provide safer treatment. 
+                        If none, please type "N/A".
+                    </p>
+                </div>
+                <div class="form-group full-width" style="margin-bottom: 1.25rem;">
+                    <label>Known Allergies</label>
+                    <textarea name="allergies" placeholder="List medications, food, or environmental triggers..."></textarea>
+                </div>
+                <div class="form-group full-width">
+                    <label>Chronic Conditions or Previous Surgeries</label>
+                    <textarea name="conditions" placeholder="e.g. Diabetes, Hypertension, etc."></textarea>
+                </div>
+            </section>
+
+            <section class="form-section">
+                <h2 class="section-title">Safety & Billing</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Emergency Contact Name <span class="required">*</span></label>
+                        <input type="text" name="emergencyName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Emergency Contact Phone <span class="required">*</span></label>
+                        <input type="tel" name="emergencyPhone" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Insurance Provider (Optional)</label>
+                        <input type="text" name="insuranceProvider" placeholder="e.g. Shikhar Insurance">
+                    </div>
+                    <div class="form-group">
+                        <label>Policy Number</label>
+                        <input type="text" name="policyNumber">
+                    </div>
+                </div>
+            </section>
+
+            <div class="terms-section">
+                <label>
+                    <input type="checkbox" name="terms" required>
+                    <span>
+                        I certify that the information provided is accurate. I consent to the processing of my health data 
+                        in accordance with MedSaathi's <a href="#" style="color: var(--primary); font-weight: 600;">Privacy Policy</a>.
+                    </span>
+                </label>
+            </div>
+
+            <div class="button-group">
+                <button type="reset" class="btn-reset">Reset</button>
+                <button type="submit" class="btn-submit">Complete Registration</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function handleSubmit(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        console.log('Patient Intake Submitted:', Object.fromEntries(formData));
+        alert('Thank you. Your registration has been received.');
+    }
+</script>
+
+</body>
+</html>

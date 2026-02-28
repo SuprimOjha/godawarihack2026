@@ -1,0 +1,91 @@
+:root {
+  --primaryColor: #7091e6;
+  --ascentColor: #619d38;
+  --secondaryColor: rgb(31, 31, 31);
+  --mainColor: #ffff;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  border: none;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--mainColor);
+}
+
+/* ******----- NAV STYLE -----****** */
+
+nav {
+  background-color: transparent;
+  max-width: 100vw;
+  margin: auto;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  left: 0;
+  right: 0;
+  top: 0;
+  position: fixed;
+  transition: 0.5s ease-out;
+  font-size: 17px;
+  box-shadow: 0px 2px 3px black;
+}
+
+.nav-logo {
+  max-width: 15%;
+}
+
+.nav-logo a {
+  width: 100%;
+  text-decoration: none;
+}
+
+.nav-links ul {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+}
+
+.nav-links ul li a {
+  text-decoration: none;
+  color: var(--secondaryColor);
+}
+
+.nav-links ul li a::after {
+  content: " ";
+  bottom: 0;
+  left: 0;
+  top: 0;
+  right: 0;
+  position: relative;
+  background-color: var(--primaryColor);
+  display: block;
+  height: 2px;
+  width: 0;
+  transition: width 0.5s ease;
+}
+
+.nav-links ul li a:hover::after {
+  width: 100%;
+}
+
+.sticky {
+  padding: 1vh 10rem;
+  font-size: 16px;
+  background-color: var(--primaryColor);
+  box-shadow: 0 0 4px black;
+  max-width: 100vw;
+}
+
+/* PAGE 1 */
+
+#page1 {
+    height: 100vh;
+    width: 100%;
+    margin-top: 7rem;
+}

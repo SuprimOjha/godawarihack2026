@@ -1,0 +1,481 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+/* ================= RESET (NAVBAR ONLY) ================= */
+.site-navbar * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ================= HEADER ================= */
+.site-navbar header {
+    background: #fff;
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.site-navbar nav {
+    max-width: 1200px;
+    margin: auto;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* ================= LOGO ================= */
+.site-navbar .logo img {
+    height: 50px;
+}
+
+/* ================= DESKTOP NAV ================= */
+.site-navbar .nav-links {
+    list-style: none;
+    display: flex;
+    gap: 3rem;
+    align-items: center;
+}
+
+.site-navbar .nav-links a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    position: relative;
+    padding-bottom: 0.4rem;
+}
+
+/* Hover underline animation */
+.site-navbar .nav-links a::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0%;
+    height: 2px;
+    background: #6aab32;
+    transition: width 0.3s ease;
+}
+
+.site-navbar .nav-links a:hover::after {
+    width: 100%;
+}
+
+.site-navbar .nav-links a:hover {
+    color: #6aab32;
+}
+
+/* ================= DROPDOWN ================= */
+.site-navbar .dropdown-link {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+/* ICON ANIMATION */
+.site-navbar .dropdown-link svg {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.3s ease;
+}
+
+.site-navbar .nav-links li:hover .dropdown-link svg {
+    transform: rotate(180deg);
+}
+
+.site-navbar .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 6px); /* directly below link */
+    left: 0;
+    min-width: 220px;
+    list-style: none;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all 0.25s ease;
+    padding: 0.5rem 0;
+    z-index: 1000;
+}
+
+
+.site-navbar .nav-links li:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.site-navbar .dropdown-menu a {
+    display: block;
+    padding: 0.8rem 1.5rem;
+    color: #333;
+}
+
+.site-navbar .dropdown-menu a:hover {
+    background: #6aab3215;
+    color: #6aab32;
+    padding-left: 2rem;
+}
+
+/* ================= LOGIN BUTTON ================= */
+.site-navbar .quick-enquiry {
+    border: 2px solid #6aab32;
+    background: transparent;
+    padding: 0.7rem 1.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.site-navbar .quick-enquiry:hover {
+    background: #6aab32;
+    color: white;
+}
+
+/* ================= LANGUAGE SWITCH ================= */
+.site-navbar .lang-switch {
+    display: flex;
+    gap: 8px;
+}
+
+.site-navbar .lang-switch button {
+    border: 2px solid #6aab32;
+    background: transparent;
+    color: #6aab32;
+    padding: 6px 14px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.site-navbar .lang-switch button:hover {
+    background: #6aab32;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.site-navbar .lang-switch button.active {
+    background: #6aab32;
+    color: white;
+}
+
+/* ================= MOBILE MENU ================= */
+.site-navbar .mobile-menu-btn {
+    display: none;
+    font-size: 1.6rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.site-navbar .mobile-nav {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 80%;
+    max-width: 300px;
+    height: 100vh;
+    background: white;
+    padding: 2rem;
+    transition: 0.3s;
+    z-index: 1000;
+}
+
+.site-navbar .mobile-nav.active {
+    left: 0;
+}
+
+.site-navbar .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+}
+
+.site-navbar .overlay.active {
+    display: block;
+}
+
+.site-navbar .mobile-nav ul {
+    list-style: none;
+}
+
+.site-navbar .mobile-nav a {
+    display: block;
+    padding: 0.8rem;
+    color: #333;
+}
+
+.site-navbar .mobile-dropdown-toggle {
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+/* Mobile icon animation */
+.site-navbar .mobile-dropdown-toggle svg {
+    transition: transform 0.3s ease;
+}
+
+.site-navbar .mobile-dropdown-toggle.active svg {
+    transform: rotate(180deg);
+}
+.site-navbar .nav-links li {
+    position: relative;
+}
+
+
+.site-navbar .mobile-dropdown {
+    display: none;
+    margin-left: 1rem;
+}
+
+.site-navbar .mobile-dropdown.active {
+    display: block;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+    .site-navbar .nav-links,
+    .site-navbar .quick-enquiry,
+    .site-navbar .lang-switch {
+        display: none;
+    }
+    .site-navbar .mobile-menu-btn {
+        display: block;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="site-navbar">
+<header>
+<nav>
+
+<div class="logo">
+<img src="{% static 'images/logo.png' %}" alt="Logo">
+</div>
+
+<ul class="nav-links">
+<li><a data-key="home" href="{% url 'home' %}">Home</a></li>
+<li><a data-key="about" href="{% url 'about' %}">About</a></li>
+
+<li>
+<a href="#" class="dropdown-link" data-key="services">
+Services
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+<path stroke-width="2" d="M19 9l-7 7-7-7"/>
+</svg>
+</a>
+<ul class="dropdown-menu">
+<li><a data-key="book" href="{% url 'booking' %}">Book Appointment</a></li>
+<li><a data-key="location" href="{% url 'live_location' %}">Live Location Of Nearest Hospitals</a></li>
+<li><a data-key="safety" href="{% url 'safety_guide' %}">Safety Guide</a></li>
+<li><a data-key="diagnosis" href="{% url 'chat_page' %}">Self Diagnosis</a></li>
+</ul>
+</li>
+
+<li>
+<a href="#" class="dropdown-link" data-key="register">
+Register
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+<path stroke-width="2" d="M19 9l-7 7-7-7"/>
+</svg>
+</a>
+<ul class="dropdown-menu">
+<li><a data-key="patient" href="{% url 'patientreg' %}">Patient Registration</a></li>
+<li><a data-key="doctor" href="{% url 'doctorreg' %}">Doctor Registration</a></li>
+</ul>
+</li>
+
+<li><a data-key="contact" href="{% url 'contact' %}">Contact</a></li>
+</ul>
+
+<a href="{% url 'patientlogin' %}">
+<button class="quick-enquiry" data-key="login">Log In</button>
+</a>
+
+<div class="lang-switch">
+<button onclick="setLanguage('en')" id="btn-en">ENG</button>
+<button onclick="setLanguage('ne')" id="btn-ne">NEP</button>
+</div>
+
+<button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+
+</nav>
+</header>
+
+<div class="overlay" id="overlay" onclick="toggleMobileMenu()"></div>
+
+<div class="mobile-nav" id="mobileNav">
+<button onclick="toggleMobileMenu()">✕</button>
+<ul>
+<li><a data-key="home" href="{% url 'home' %}">Home</a></li>
+<li><a data-key="about" href="{% url 'about' %}">About</a></li>
+</ul>
+</div>
+
+</div>
+
+<script>
+/* ================= MOBILE MENU ================= */
+function toggleMobileMenu() {
+    document.getElementById("mobileNav").classList.toggle("active");
+    document.getElementById("overlay").classList.toggle("active");
+}
+
+/* ================= LANGUAGE ================= */
+const translations = {
+    en: {
+        /* ===== NAVBAR ===== */
+        home: "Home",
+        about: "About",
+        services: "Services",
+        contact: "Contact",
+        login: "Log In",
+        register: "Register",
+        patient: "Patient Registration",
+        doctor: "Doctor Registration",
+        book: "Book Appointment",
+        location: "Live Location Of Nearest Hospitals",
+        safety: "Safety Guide",
+        diagnosis: "Self Diagnosis",
+
+        /* ===== HERO SECTION ===== */
+        hero_title: "Healthcare That Reaches Everyone",
+        hero_slogan: "Bridging the Gap Between Rural Communities and Quality Medical Care",
+        hero_desc: "We bring modern healthcare solutions to remote areas through innovative telemedicine and community health programs. Our mission is to ensure every individual, regardless of location, has access to the medical care they deserve.",
+
+        /* ===== FEATURES ===== */
+        feature1_title: "Cheap Health Checkups",
+        feature1_desc: "Cheap health consultations with professional doctors right on the palm of your hand.",
+        feature2_title: "Ease of access",
+        feature2_desc: "As a bridge between rural areas to modern healthcare solutions, it provides easy access to medical services.",
+        feature3_title: "Online appointments",
+        feature3_desc: "Book appointments online with your preferred healthcare provider from the comfort of your home.",
+
+        /* ===== TRUST BADGE ===== */
+        trust_title: "Trusted by 50,000+ Patients",
+        trust_desc: "Certified healthcare professionals committed to your wellbeing",
+
+        /* ===== WHY US ===== */
+        why_title: "Why Choose Us",
+        why_subtitle: "Comprehensive healthcare solutions designed specifically for rural and underserved communities",
+
+        why1_title: "Telemedicine Access",
+        why1_desc: "Connect with qualified healthcare professionals remotely through our advanced telemedicine platform, bringing expert medical consultation to you.",
+
+        why2_title: "24/7 Availability",
+        why2_desc: "Through our platform's large reach with health experts, you are facilitated with health services round the clock.",
+
+        why3_title: "Community Health Workers",
+        why3_desc: "Trained local health workers in rural communities provide essential care, health education, and serve as vital links to our medical network.",
+
+        why4_title: "Affordable Care",
+        why4_desc: "We believe healthcare is a right, not a privilege. Our services are designed to be accessible and affordable for all community members.",
+
+        why5_title: "Digital Health Records",
+        why5_desc: "Secure digital health records ensure your medical history is safely stored and easily accessible to healthcare providers when needed.",
+
+        why6_title: "Quick Response",
+        why6_desc: "Emergency medical support with rapid response times, ensuring critical care reaches patients in remote areas when every second counts."
+    },
+
+    ne: {
+        /* ===== NAVBAR ===== */
+        home: "गृहपृष्ठ",
+        about: "हाम्रो बारेमा",
+        services: "सेवाहरू",
+        contact: "सम्पर्क",
+        login: "लग इन",
+        register: "दर्ता",
+        patient: "बिरामी दर्ता",
+        doctor: "डाक्टर दर्ता",
+        book: "अपोइन्टमेन्ट बुक गर्नुहोस्",
+        location: "नजिकका अस्पतालहरूको प्रत्यक्ष स्थान",
+        safety: "सुरक्षा मार्गदर्शन",
+        diagnosis: "स्व-निदान",
+
+        /* ===== HERO SECTION ===== */
+        hero_title: "स्वास्थ्य सेवा जसले सबैलाई समेट्छ",
+        hero_slogan: "ग्रामीण समुदाय र गुणस्तरीय चिकित्सा सेवाबीचको दूरी घटाउँदै",
+        hero_desc: "हामी नवीन टेलिमेडिसिन र सामुदायिक स्वास्थ्य कार्यक्रममार्फत दुर्गम क्षेत्रमा आधुनिक स्वास्थ्य सेवा पुर्‍याउँछौं। हाम्रो लक्ष्य स्थानको पर्वाह नगरी सबैलाई आवश्यक चिकित्सा सेवा उपलब्ध गराउनु हो।",
+
+        /* ===== FEATURES ===== */
+        feature1_title: "सस्तो स्वास्थ्य जाँच",
+        feature1_desc: "अनुभवी डाक्टरहरूसँग सस्तो स्वास्थ्य परामर्श तपाईंको हातमै।",
+        feature2_title: "सजिलो पहुँच",
+        feature2_desc: "ग्रामीण क्षेत्रलाई आधुनिक स्वास्थ्य सेवासँग जोड्दै सजिलो र भरपर्दो सेवा प्रदान गर्दछ।",
+        feature3_title: "अनलाइन अपोइन्टमेन्ट",
+        feature3_desc: "घरमै बसेर आफ्नो मनपर्ने स्वास्थ्य सेवा प्रदायकसँग अपोइन्टमेन्ट बुक गर्नुहोस्।",
+
+        /* ===== TRUST BADGE ===== */
+        trust_title: "५०,०००+ बिरामीहरूको विश्वास",
+        trust_desc: "तपाईंको स्वास्थ्यप्रति प्रतिबद्ध प्रमाणित स्वास्थ्यकर्मीहरू",
+
+        /* ===== WHY US ===== */
+        why_title: "हामीलाई किन रोज्ने?",
+        why_subtitle: "ग्रामीण तथा सेवाबाट वञ्चित समुदायका लागि विशेष रूपमा तयार पारिएका स्वास्थ्य समाधानहरू",
+
+        why1_title: "टेलिमेडिसिन पहुँच",
+        why1_desc: "उन्नत टेलिमेडिसिन प्लेटफर्ममार्फत अनुभवी स्वास्थ्यकर्मीहरूसँग टाढैबाट परामर्श लिनुहोस्।",
+
+        why2_title: "२४/७ उपलब्धता",
+        why2_desc: "हाम्रो स्वास्थ्य विशेषज्ञहरूको विशाल सञ्जालमार्फत चौबीसै घण्टा सेवा उपलब्ध।",
+
+        why3_title: "सामुदायिक स्वास्थ्यकर्मी",
+        why3_desc: "स्थानीय रूपमा प्रशिक्षित स्वास्थ्यकर्मीहरूले आवश्यक उपचार, स्वास्थ्य शिक्षा र चिकित्सा सञ्जालसँगको सेतुको भूमिका निभाउँछन्।",
+
+        why4_title: "सुलभ स्वास्थ्य सेवा",
+        why4_desc: "हामी स्वास्थ्य सेवालाई अधिकार मान्दछौं। त्यसैले हाम्रो सेवा सबैका लागि पहुँचयोग्य र सुलभ बनाइएको छ।",
+
+        why5_title: "डिजिटल स्वास्थ्य अभिलेख",
+        why5_desc: "सुरक्षित डिजिटल अभिलेखले तपाईंको स्वास्थ्य इतिहास सुरक्षित र आवश्यक पर्दा सजिलै उपलब्ध गराउँछ।",
+
+        why6_title: "छिटो प्रतिक्रिया",
+        why6_desc: "आपतकालीन अवस्थामा छिटो प्रतिक्रिया दिँदै दुर्गम क्षेत्रमा समेत समयमै उपचार सुनिश्चित गर्दछ।"
+    }
+};
+
+function setLanguage(lang) {
+    localStorage.setItem("siteLang", lang);
+    applyLanguage(lang);
+    document.getElementById("btn-en").classList.toggle("active", lang === "en");
+    document.getElementById("btn-ne").classList.toggle("active", lang === "ne");
+}
+
+function applyLanguage(lang) {
+    document.querySelectorAll("[data-key]").forEach(el => {
+        if (translations[lang][el.dataset.key]) {
+            el.innerText = translations[lang][el.dataset.key];
+        }
+    });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const lang = localStorage.getItem("siteLang") || "en";
+    setLanguage(lang);
+});
+</script>
+
+</body>
+</html>

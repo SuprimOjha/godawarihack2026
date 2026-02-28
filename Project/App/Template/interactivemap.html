@@ -1,0 +1,910 @@
+{% extends 'base.html' %}
+{% block title %}MedSaathi - Live Location{% endblock %}
+
+    {% block extra_css %}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        main {
+            margin-top: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            color: #0a84c5;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(87, 183, 208, 0.2);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .tagline {
+            font-size: 1rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .map-container {
+            flex: 1 1 800px;
+            background: white;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            min-height: 700px;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+            min-height: 700px;
+            z-index: 1;
+        }
+
+        .sidebar {
+            flex: 1 1 350px;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar h2 {
+            color: #0a84c5;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eaeaea;
+            font-size: 1.8rem;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .locate-btn, .filter-btn {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 140px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .locate-btn {
+            background: #6aab32;
+            color: white;
+        }
+
+        .locate-btn:hover {
+            background: #64a12f;
+        }
+
+        .filter-btn {
+            background: #fcfff9;
+            color: #6aab32;
+            border: 2px solid #6aab32;
+        }
+
+        .filter-btn:hover {
+            background: #6aab3214;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eaeaea;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #777;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            color: #4d841e;
+            border-bottom: 3px solid #4d841e;
+        }
+
+        .tab-content {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .list-container {
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .list-item {
+            padding: 18px;
+            border-radius: 10px;
+            background: #f8f9fa;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid #57B7D0;
+        }
+
+        .list-item:hover {
+            background: #e9f7fb;
+            transform: translateX(5px);
+        }
+
+        .list-item.active {
+            background: #e1f0fa;
+            border-left-color: #2a8da0;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .item-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #0a84c5;
+        }
+
+        .item-type {
+            background: #6aab32 ;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .item-location {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 5px;
+        }
+
+        .item-specialty {
+            color: #6aab32;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .status-info {
+            background: #f0f9ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 0.95rem;
+            border-left: 4px solid #57B7D0;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #eaeaea;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        .legend-doctor {
+            background-color: #4dabf7;
+        }
+
+        .legend-hospital {
+            background-color: #51cf66;
+        }
+
+        .legend-clinic {
+            background-color: #ff922b;
+        }
+
+        .legend-user {
+            background-color: #ff6b6b;
+        }
+
+        .legend-highlighted {
+            background-color: #da77f2;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #eaeaea;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #57B7D0;
+        }
+
+        .distance-info {
+            font-size: 0.85rem;
+            color: #777;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        @media (max-width: 1100px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .map-container, .sidebar {
+                flex: 1 1 auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .tagline {
+                font-size: 1rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+
+        /* Animation for pulsing markers */
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+    </style>
+    {% endblock %}
+</head>
+<body>
+    {% block content %}
+    <header>
+        <div class="header-content">
+            <h1>MedSaathi Health Services</h1>
+            <p class="tagline">Connecting rural communities with healthcare providers</p>
+            <p>Find doctors, hospitals, and clinics near you. Get virtual consultations before traveling.</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <div class="map-container">
+                <div id="map"></div>
+            </div>
+            
+            <div class="sidebar">
+                <h2>Healthcare Services</h2>
+                
+                <div class="controls">
+                    <button class="locate-btn" id="locateMe">
+                        <i class="fas fa-location-arrow"></i> Locate Me
+                    </button>
+                    <button class="filter-btn" id="filterToggle">
+                        <i class="fas fa-filter"></i> Filter Services
+                    </button>
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Search doctors, hospitals, clinics...">
+                </div>
+                
+                <div class="tabs">
+                    <div class="tab active" data-tab="all">All Services</div>
+                    <div class="tab" data-tab="doctors">Doctors</div>
+                    <div class="tab" data-tab="hospitals">Hospitals</div>
+                    <div class="tab" data-tab="clinics">Clinics</div>
+                </div>
+                
+                <div class="tab-content active" id="all-tab">
+                    <div class="list-container" id="allList"></div>
+                </div>
+                
+                <div class="tab-content" id="doctors-tab">
+                    <div class="list-container" id="doctorsList"></div>
+                </div>
+                
+                <div class="tab-content" id="hospitals-tab">
+                    <div class="list-container" id="hospitalsList"></div>
+                </div>
+                
+                <div class="tab-content" id="clinics-tab">
+                    <div class="list-container" id="clinicsList"></div>
+                </div>
+                
+                <div class="status-info" id="statusInfo">
+                    <strong><i class="fas fa-info-circle"></i> Status:</strong> Detecting your location and loading healthcare services...
+                </div>
+                
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color legend-user"></div>
+                        <span>Your Location</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color legend-doctor"></div>
+                        <span>Doctors</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color legend-hospital"></div>
+                        <span>Hospitals</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color legend-clinic"></div>
+                        <span>Clinics</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color legend-highlighted"></div>
+                        <span>Selected</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize map with Nepal as default center
+        const map = L.map('map').setView([27.7172, 85.3240], 8); // Coordinates for Kathmandu, Nepal
+        
+        // Add tile layer (OpenStreetMap)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        
+        // Variables to store markers and user location
+        let userMarker = null;
+        let userLocation = null;
+        let allMarkers = [];
+        let selectedMarker = null;
+        
+        // Sample healthcare data for Nepal
+        const healthcareData = {
+            doctors: [
+                { id: 1, name: "Dr. Devid Basnet", type: "doctor", specialty: "Gynecologist", qualification: "MD, MBA", 
+                  city: "Kathmandu", district: "Kathmandu", address: "New Baneshwor", lat: 27.6926, lng: 85.3421 },
+                { id: 2, name: "Dr. Nawal Khanal", type: "doctor", specialty: "Neurologist", qualification: "MD, MBA", 
+                  city: "Pokhara", district: "Kaski", address: "Lakeside", lat: 28.2096, lng: 83.9856 },
+                { id: 3, name: "Dr. Rajesh Sharma", type: "doctor", specialty: "Cardiologist", qualification: "MD", 
+                  city: "Biratnagar", district: "Morang", address: "Biratnagar-2", lat: 26.4525, lng: 87.2718 },
+                { id: 4, name: "Dr. Anita Gurung", type: "doctor", specialty: "Pediatrician", qualification: "MD", 
+                  city: "Chitwan", district: "Chitwan", address: "Narayangadh", lat: 27.6833, lng: 84.4167 },
+                { id: 5, name: "Dr. Suresh Thapa", type: "doctor", specialty: "General Physician", qualification: "MBBS", 
+                  city: "Butwal", district: "Rupandehi", address: "Butwal-10", lat: 27.7000, lng: 83.4500 }
+            ],
+            hospitals: [
+                { id: 101, name: "Bir Hospital", type: "hospital", specialty: "Multi-specialty", beds: 500, 
+                  city: "Kathmandu", district: "Kathmandu", address: "Kantipath", lat: 27.7044, lng: 85.3174 },
+                { id: 102, name: "Patan Hospital", type: "hospital", specialty: "Multi-specialty", beds: 400, 
+                  city: "Lalitpur", district: "Lalitpur", address: "Lagankhel", lat: 27.6667, lng: 85.3167 },
+                { id: 103, name: "Western Regional Hospital", type: "hospital", specialty: "Multi-specialty", beds: 300, 
+                  city: "Pokhara", district: "Kaski", address: "Pokhara-8", lat: 28.2333, lng: 83.9833 },
+                { id: 104, name: "BP Koirala Institute of Health Sciences", type: "hospital", specialty: "Teaching Hospital", beds: 700, 
+                  city: "Dharan", district: "Sunsari", address: "Dharan-18", lat: 26.8125, lng: 87.2836 },
+                { id: 105, name: "Narayani Hospital", type: "hospital", specialty: "General Hospital", beds: 200, 
+                  city: "Chitwan", district: "Chitwan", address: "Bharatpur-10", lat: 27.6833, lng: 84.4333 }
+            ],
+            clinics: [
+                { id: 201, name: "City Health Clinic", type: "clinic", specialty: "General Practice", 
+                  city: "Kathmandu", district: "Kathmandu", address: "Thamel", lat: 27.7151, lng: 85.3120 },
+                { id: 202, name: "Mountain View Clinic", type: "clinic", specialty: "Primary Care", 
+                  city: "Pokhara", district: "Kaski", address: "Pokhara-6", lat: 28.2167, lng: 83.9833 },
+                { id: 203, name: "Community Health Clinic", type: "clinic", specialty: "Family Medicine", 
+                  city: "Biratnagar", district: "Morang", address: "Biratnagar-4", lat: 26.4550, lng: 87.2778 },
+                { id: 204, name: "Rural Health Post", type: "clinic", specialty: "Basic Health Services", 
+                  city: "Gorkha", district: "Gorkha", address: "Gorkha Bazar", lat: 28.0000, lng: 84.6333 },
+                { id: 205, name: "Sunrise Medical Clinic", type: "clinic", specialty: "General Practice", 
+                  city: "Butwal", district: "Rupandehi", address: "Butwal-12", lat: 27.7000, lng: 83.4667 }
+            ]
+        };
+        
+        // Update status info
+        function updateStatus(message, isError = false) {
+            const statusEl = document.getElementById('statusInfo');
+            const icon = isError ? '<i class="fas fa-exclamation-triangle"></i>' : '<i class="fas fa-info-circle"></i>';
+            statusEl.innerHTML = `<strong>${icon} Status:</strong> ${message}`;
+            statusEl.style.borderLeftColor = isError ? '#ff6b6b' : '#57B7D0';
+        }
+        
+        // Get user's current location
+        function locateUser() {
+            if (navigator.geolocation) {
+                updateStatus("Detecting your location...");
+                
+                navigator.geolocation.getCurrentPosition(
+                    // Success callback
+                    function(position) {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        userLocation = { lat, lng };
+                        
+                        // Remove existing user marker if any
+                        if (userMarker) {
+                            map.removeLayer(userMarker);
+                        }
+                        
+                        // Add marker for user's location
+                        userMarker = L.marker([lat, lng], {
+                            icon: L.divIcon({
+                                className: 'user-location-marker',
+                                html: '<div style="background-color:#ff6b6b; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.3);"></div>',
+                                iconSize: [24, 24],
+                                iconAnchor: [12, 12]
+                            })
+                        }).addTo(map);
+                        
+                        // Add popup to user marker
+                        userMarker.bindPopup("<b>Your Current Location</b><br>Start your search for healthcare services from here.");
+                        
+                        // Center map on user's location
+                        map.setView([lat, lng], 10);
+                        
+                        updateStatus(`Location detected! Now showing healthcare services near you.`);
+                        
+                        // Load healthcare data on map
+                        addHealthcareDataToMap();
+                        
+                        // Populate lists
+                        populateAllLists();
+                    },
+                    // Error callback
+                    function(error) {
+                        console.error("Error getting location:", error);
+                        let errorMsg = "Unable to detect your location. ";
+                        
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                errorMsg += "Permission denied. Showing healthcare services in Nepal.";
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errorMsg += "Location information unavailable. Showing healthcare services in Nepal.";
+                                break;
+                            case error.TIMEOUT:
+                                errorMsg += "Location request timed out. Showing healthcare services in Nepal.";
+                                break;
+                            default:
+                                errorMsg += "Unknown error. Showing healthcare services in Nepal.";
+                        }
+                        
+                        updateStatus(errorMsg, true);
+                        
+                        // Use default location (Kathmandu, Nepal)
+                        userLocation = { lat: 27.7172, lng: 85.3240 };
+                        
+                        // Load healthcare data on map
+                        addHealthcareDataToMap();
+                        
+                        // Populate lists
+                        populateAllLists();
+                    },
+                    // Options
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            } else {
+                updateStatus("Geolocation is not supported by your browser. Showing healthcare services in Nepal.", true);
+                
+                // Use default location (Kathmandu, Nepal)
+                userLocation = { lat: 27.7172, lng: 85.3240 };
+                
+                // Load healthcare data on map
+                addHealthcareDataToMap();
+                
+                // Populate lists
+                populateAllLists();
+            }
+        }
+        
+        // Add healthcare data to the map
+        function addHealthcareDataToMap() {
+            // Clear existing markers
+            allMarkers.forEach(marker => map.removeLayer(marker));
+            allMarkers = [];
+            
+            // Add markers for doctors
+            healthcareData.doctors.forEach(doctor => {
+                const marker = createMarker(doctor, 'doctor');
+                allMarkers.push(marker);
+            });
+            
+            // Add markers for hospitals
+            healthcareData.hospitals.forEach(hospital => {
+                const marker = createMarker(hospital, 'hospital');
+                allMarkers.push(marker);
+            });
+            
+            // Add markers for clinics
+            healthcareData.clinics.forEach(clinic => {
+                const marker = createMarker(clinic, 'clinic');
+                allMarkers.push(marker);
+            });
+        }
+        
+        // Create a marker for a healthcare facility
+        function createMarker(facility, type) {
+            let color, iconHtml;
+            
+            switch(type) {
+                case 'doctor':
+                    color = '#4dabf7';
+                    iconHtml = '<i class="fas fa-user-md"></i>';
+                    break;
+                case 'hospital':
+                    color = '#51cf66';
+                    iconHtml = '<i class="fas fa-hospital"></i>';
+                    break;
+                case 'clinic':
+                    color = '#ff922b';
+                    iconHtml = '<i class="fas fa-clinic-medical"></i>';
+                    break;
+                default:
+                    color = '#4dabf7';
+                    iconHtml = '<i class="fas fa-star-of-life"></i>';
+            }
+            
+            const marker = L.marker([facility.lat, facility.lng], {
+                icon: L.divIcon({
+                    className: 'healthcare-marker',
+                    html: `<div style="background-color:${color}; width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 8px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-size: 14px;">${iconHtml}</div>`,
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 15]
+                })
+            }).addTo(map);
+            
+            // Store facility data with marker
+            marker.facility = facility;
+            marker.type = type;
+            
+            // Add popup with facility info
+            let popupContent = `<b>${facility.name}</b><br>`;
+            popupContent += `<small>${type.charAt(0).toUpperCase() + type.slice(1)}</small><br>`;
+            popupContent += `<hr style="margin: 5px 0;">`;
+            
+            if (facility.specialty) {
+                popupContent += `<b>Specialty:</b> ${facility.specialty}<br>`;
+            }
+            
+            if (facility.qualification) {
+                popupContent += `<b>Qualification:</b> ${facility.qualification}<br>`;
+            }
+            
+            if (facility.beds) {
+                popupContent += `<b>Beds:</b> ${facility.beds}<br>`;
+            }
+            
+            popupContent += `<b>Location:</b> ${facility.city}, ${facility.district}<br>`;
+            popupContent += `<b>Address:</b> ${facility.address}<br><br>`;
+            
+            // Add distance if user location is available
+            if (userLocation) {
+                const distance = calculateDistance(
+                    userLocation.lat, userLocation.lng, 
+                    facility.lat, facility.lng
+                );
+                popupContent += `<b>Distance:</b> ${distance} km from your location<br>`;
+            }
+            
+            // Add action buttons
+            popupContent += `<hr style="margin: 10px 0;">`;
+            popupContent += `<div style="display: flex; gap: 5px; margin-top: 10px;">
+                <button onclick="selectFacility(${facility.id}, '${type}')" style="padding: 5px 10px; background: #57B7D0; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Select</button>
+                <button onclick="alert('Virtual consultation feature will be implemented in the next phase. This will allow rural users to connect with ${facility.name} online before traveling.')" style="padding: 5px 10px; background: #51cf66; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">Consult Online</button>
+            </div>`;
+            
+            marker.bindPopup(popupContent);
+            
+            // Add click event to highlight facility
+            marker.on('click', function() {
+                selectFacility(facility.id, type);
+            });
+            
+            return marker;
+        }
+        
+        // Calculate distance between two coordinates (Haversine formula)
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Earth's radius in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return Math.round(R * c);
+        }
+        
+        // Select and highlight a facility
+        function selectFacility(facilityId, type) {
+            // Remove previous highlight
+            if (selectedMarker) {
+                // Reset to original icon
+                const originalIcon = createMarkerIcon(selectedMarker.type);
+                selectedMarker.setIcon(originalIcon);
+            }
+            
+            // Remove active class from all list items
+            document.querySelectorAll('.list-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Find the facility to highlight
+            let facility;
+            if (type === 'doctor') {
+                facility = healthcareData.doctors.find(d => d.id === facilityId);
+            } else if (type === 'hospital') {
+                facility = healthcareData.hospitals.find(h => h.id === facilityId);
+            } else if (type === 'clinic') {
+                facility = healthcareData.clinics.find(c => c.id === facilityId);
+            }
+            
+            if (!facility) return;
+            
+            // Find the marker for this facility
+            selectedMarker = allMarkers.find(marker => 
+                marker.facility && marker.facility.id === facilityId && marker.type === type
+            );
+            
+            if (selectedMarker) {
+                // Highlight the marker
+                const highlightedIcon = L.divIcon({
+                    className: 'highlighted-marker',
+                    html: '<div style="background-color:#da77f2; width: 36px; height: 36px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 12px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; animation: pulse 1.5s infinite;"><i class="fas fa-star"></i></div>',
+                    iconSize: [36, 36],
+                    iconAnchor: [18, 18]
+                });
+                
+                selectedMarker.setIcon(highlightedIcon);
+                
+                // Open popup
+                selectedMarker.openPopup();
+                
+                // Center map on the selected facility
+                map.setView([facility.lat, facility.lng], 12);
+                
+                updateStatus(`Selected: ${facility.name} in ${facility.city}`);
+            }
+            
+            // Add active class to corresponding list item
+            const listItem = document.querySelector(`.list-item[data-id="${facilityId}"][data-type="${type}"]`);
+            if (listItem) {
+                listItem.classList.add('active');
+                listItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+        
+        // Create marker icon based on type
+        function createMarkerIcon(type) {
+            let color, iconHtml;
+            
+            switch(type) {
+                case 'doctor':
+                    color = '#4dabf7';
+                    iconHtml = '<i class="fas fa-user-md"></i>';
+                    break;
+                case 'hospital':
+                    color = '#51cf66';
+                    iconHtml = '<i class="fas fa-hospital"></i>';
+                    break;
+                case 'clinic':
+                    color = '#ff922b';
+                    iconHtml = '<i class="fas fa-clinic-medical"></i>';
+                    break;
+                default:
+                    color = '#4dabf7';
+                    iconHtml = '<i class="fas fa-star-of-life"></i>';
+            }
+            
+            return L.divIcon({
+                className: 'healthcare-marker',
+                html: `<div style="background-color:${color}; width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 8px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-size: 14px;">${iconHtml}</div>`,
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            });
+        }
+        
+        // Populate all lists
+        function populateAllLists() {
+            populateList('all', healthcareData.doctors.concat(healthcareData.hospitals, healthcareData.clinics));
+            populateList('doctors', healthcareData.doctors);
+            populateList('hospitals', healthcareData.hospitals);
+            populateList('clinics', healthcareData.clinics);
+        }
+        
+        // Populate a specific list
+        function populateList(listType, facilities) {
+            const listContainer = document.getElementById(`${listType}List`);
+            listContainer.innerHTML = '';
+            
+            // Sort facilities by distance if user location is available
+            if (userLocation) {
+                facilities.sort((a, b) => {
+                    const distA = calculateDistance(userLocation.lat, userLocation.lng, a.lat, a.lng);
+                    const distB = calculateDistance(userLocation.lat, userLocation.lng, b.lat, b.lng);
+                    return distA - distB;
+                });
+            }
+            
+            facilities.forEach(facility => {
+                const listItem = document.createElement('div');
+                listItem.className = 'list-item';
+                listItem.dataset.id = facility.id;
+                listItem.dataset.type = facility.type;
+                
+                // Calculate distance if user location is available
+                let distanceInfo = '';
+                if (userLocation) {
+                    const distance = calculateDistance(
+                        userLocation.lat, userLocation.lng, 
+                        facility.lat, facility.lng
+                    );
+                    distanceInfo = `<div class="distance-info"><i class="fas fa-location-arrow"></i> ${distance} km away</div>`;
+                }
+                
+                listItem.innerHTML = `
+                    <div class="item-header">
+                        <div class="item-name">${facility.name}</div>
+                        <div class="item-type">${facility.type.charAt(0).toUpperCase() + facility.type.slice(1)}</div>
+                    </div>
+                    <div class="item-location">${facility.city}, ${facility.district}</div>
+                    <div class="item-location"><small>${facility.address}</small></div>
+                    ${facility.specialty ? `<div class="item-specialty">${facility.specialty}</div>` : ''}
+                    ${distanceInfo}
+                `;
+                
+                // Add click event to select facility
+                listItem.addEventListener('click', () => selectFacility(facility.id, facility.type));
+                
+                listContainer.appendChild(listItem);
+            });
+        }
+        
+        // Initialize the map when page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            // Start by locating the user
+            locateUser();
+            
+            // Tab switching functionality
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Update active tab
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Update active tab content
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                });
+            });
+            
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                // Filter markers on map
+                allMarkers.forEach(marker => {
+                    const facility = marker.facility;
+                    const matches = facility.name.toLowerCase().includes(searchTerm) || 
+                                   facility.city.toLowerCase().includes(searchTerm) ||
+                                   facility.specialty.toLowerCase().includes(searchTerm) ||
+                                   (facility.type && facility.type.toLowerCase().includes(searchTerm));
+                    
+                    if (matches || searchTerm === '') {
+                        map.addLayer(marker);
+                    } else {
+                        map.removeLayer(marker);
+                    }
+                });
+                
+                // Filter list items
+                document.querySelectorAll('.list-item').forEach(item => {
+                    const text = item.textContent.toLowerCase();
+                    if (text.includes(searchTerm) || searchTerm === '') {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Filter toggle button
+            document.getElementById('filterToggle').addEventListener('click', function() {
+                alert('Filter functionality will be implemented in the next phase. You will be able to filter by specialty, distance, and availability.');
+            });
+        });
+    </script>
+    {% endblock %}
+</body>

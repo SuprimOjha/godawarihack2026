@@ -1,0 +1,505 @@
+{% extends 'base.html'%}
+    {% block title%}About us-Medsaathi{%endblock%}
+    {% block extra_css%}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #ffffff;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            max-width: 1200px;
+            margin: 6rem auto 4rem;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease-out 0.2s forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-content h1 {
+            font-size: 3.2rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            color: #6aab32;
+        }
+
+        .hero-content h1 .highlight {
+            color: #2C5F7C;
+            display: block;
+        }
+
+        .hero-content p {
+            color: #555;
+            margin-bottom: 1.5rem;
+            text-align: justify;
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .hero-image {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(44, 95, 124, 0.2);
+            transition: transform 0.4s ease;
+        }
+
+        .hero-image:hover {
+            transform: scale(1.02);
+            box-shadow: 0 20px 60px rgba(44, 95, 124, 0.3);
+        }
+
+        .hero-image img {
+            width: 100%;
+            border-radius: 20px;
+            display: block;
+        }
+
+        /* About Section */
+        .about-section {
+            background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
+            padding: 6rem 2rem;
+        }
+
+        .about-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .about-image {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(106, 171, 50, 0.2);
+            transition: transform 0.4s ease;
+            opacity: 0;
+            transform: translateX(-50px);
+            animation: slideInLeft 1s ease-out 0.5s forwards;
+        }
+
+        @keyframes slideInLeft {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .about-image:hover {
+            transform: scale(1.02);
+            box-shadow: 0 20px 60px rgba(106, 171, 50, 0.3);
+        }
+
+        .about-image img {
+            width: 100%;
+            border-radius: 20px;
+            display: block;
+        }
+
+        .about-content {
+            opacity: 0;
+            transform: translateX(50px);
+            animation: slideInRight 1s ease-out 0.5s forwards;
+        }
+
+        @keyframes slideInRight {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .about-content h2 {
+            font-size: 2.8rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            color: #2C5F7C;
+        }
+
+        .about-content h2 .highlight {
+            color: #6aab32;
+            display: block;
+        }
+
+        .about-content p {
+            color: #555;
+            margin-bottom: 2rem;
+            text-align: justify;
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .team-btn {
+            background: linear-gradient(135deg, #6aab32 0%, #5e972c 100%);
+            color: white;
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 10px 30px rgba(106, 171, 50, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .team-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .team-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .team-btn:hover {
+            background: linear-gradient(135deg, #5e972c 0%, #4d7d23 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(106, 171, 50, 0.4);
+        }
+
+        /* Stats Section */
+        .stats-section {
+            max-width: 1200px;
+            margin: 6rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 2.5rem 2rem;
+            background: white;
+            border-radius: 20px;
+            border: 2px solid #e8f0f2;
+            box-shadow: 0 5px 20px rgba(44, 95, 124, 0.08);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .stat-card.reveal-stat {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .stat-card:nth-child(1) { transition-delay: 0.1s; }
+        .stat-card:nth-child(2) { transition-delay: 0.2s; }
+        .stat-card:nth-child(3) { transition-delay: 0.3s; }
+        .stat-card:nth-child(4) { transition-delay: 0.4s; }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(106, 171, 50, 0.2);
+            border-color: #6aab32;
+            background: linear-gradient(135deg, #f0f9f4 0%, #e8f5e9 100%);
+        }
+
+        .stat-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #2C5F7C 0%, #3d7a9e 100%);
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.6s ease;
+            transform-style: preserve-3d;
+            box-shadow: 0 8px 20px rgba(44, 95, 124, 0.3);
+        }
+
+        .stat-icon svg {
+            width: 35px;
+            height: 35px;
+            color: white;
+        }
+
+        .stat-card:hover .stat-icon {
+            transform: rotateY(180deg);
+            background: linear-gradient(135deg, #6aab32 0%, #5e972c 100%);
+            box-shadow: 0 10px 30px rgba(106, 171, 50, 0.4);
+        }
+
+        .stat-number {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #2C5F7C;
+            margin-bottom: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .stat-card:hover .stat-number {
+            color: #6aab32;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .stat-card:hover .stat-label {
+            color: #2C5F7C;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 968px) {
+            .hero-section,
+            .about-container {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
+            .stats-section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .about-content h2 {
+                font-size: 2.2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                margin-top: 3rem;
+            }
+
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+
+            .about-content h2 {
+                font-size: 1.8rem;
+            }
+
+            .stats-section {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .stat-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .team-btn {
+                width: 100%;
+            }
+        }
+    </style>
+    {% endblock %}
+</head>
+<body>
+ {% block content %}
+<section class="hero-section">
+    <div class="hero-content">
+        <h1>
+            <span class="highlight" data-key="hero_highlight">Your Health</span> 
+            <span data-key="hero_title">is Our Priority</span>
+        </h1>
+        <p data-key="hero_desc1">
+            We deliver comprehensive healthcare services designed around the unique needs of each patient we serve. By combining modern telecommunication, a commitment to excellence, and compassionate care, we strive to produce sustainable and measurable health outcomes through telemedicine. Our approach prioritizes patient safety and accessibility to create solutions that drive meaningful and lasting impact.
+        </p>
+        <p data-key="hero_desc2">
+            Our mission is to become a trusted global healthcare partner by leading with innovation in patient care and medical services, powered by a highly skilled professional team and advanced technology. We aim to shape the future of healthcare delivery, enabling individuals and communities to live healthier and happier lives in an ever-evolving medical landscape.
+        </p>
+    </div>
+    <div class="hero-image">
+        <img src="https://images.squarespace-cdn.com/content/v1/667a2c04ef75774bb7c7ec6e/2d29c4e6-0bd0-4218-acbe-5893f885506d/ahf-stories-telehealth-waku-2024.jpeg" alt="Rural Nepal health worker with child using telemedicine app">
+    </div>
+</section>
+
+<section class="about-section">
+    <div class="about-container">
+        <div class="about-image">
+            <img src="https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=800&q=80" alt="Rural community health gathering in Nepal mountains">
+        </div>
+        <div class="about-content">
+            <h2 data-key="about_title">Know more about<br><span class="highlight">MedSaathi Excellence</span></h2>
+            <p data-key="about_desc1">
+                Born just a day ago at an event held at Susma Godawari College called <strong>“Godawari HackS”</strong>, MedSaathi is eager to move forward and provide services that truly matter to the people who need them most.
+            </p>
+            <p data-key="about_desc2">
+                We believe in making quality healthcare accessible to everyone, especially in rural and underserved communities where medical facilities are limited.
+            </p>
+            <button class="team-btn" data-key="about_button">Our Medical Team</button>
+        </div>
+    </div>
+</section>
+
+<section class="stats-section">
+    <div class="stat-card">
+        <div class="stat-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+        </div>
+        <div class="stat-number" data-target="24">0</div>
+        <div class="stat-label" data-key="stat1_label">hours of Excellence</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        </div>
+        <div class="stat-number" data-target="500">0</div>
+        <div class="stat-label" data-key="stat2_label">Satisfied Patients</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        </div>
+        <div class="stat-number" data-target="450">0</div>
+        <div class="stat-label" data-key="stat3_label">Treatments Completed</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+        </div>
+        <div class="stat-number" data-target="6">0</div>
+        <div class="stat-label" data-key="stat4_label">Medical Specialists</div>
+    </div>
+</section>
+
+<script>
+const pageTranslations = {
+    en: {
+        hero_highlight: "Your Health",
+        hero_title: "is Our Priority",
+        hero_desc1: "We deliver comprehensive healthcare services designed around the unique needs of each patient we serve. By combining modern telecommunication, a commitment to excellence, and compassionate care, we strive to produce sustainable and measurable health outcomes through telemedicine. Our approach prioritizes patient safety and accessibility to create solutions that drive meaningful and lasting impact.",
+        hero_desc2: "Our mission is to become a trusted global healthcare partner by leading with innovation in patient care and medical services, powered by a highly skilled professional team and advanced technology. We aim to shape the future of healthcare delivery, enabling individuals and communities to live healthier and happier lives in an ever-evolving medical landscape.",
+        about_title: "Know more about<br><span class='highlight'>MedSaathi Excellence</span>",
+        about_desc1: "Born just a day ago at an event held at Susma Godawari College called <strong>“Godawari HackS”</strong>, MedSaathi is eager to move forward and provide services that truly matter to the people who need them most.",
+        about_desc2: "We believe in making quality healthcare accessible to everyone, especially in rural and underserved communities where medical facilities are limited.",
+        about_button: "Our Medical Team",
+        stat1_label: "hours of Excellence",
+        stat2_label: "Satisfied Patients",
+        stat3_label: "Treatments Completed",
+        stat4_label: "Medical Specialists"
+    },
+    ne: {
+        hero_highlight: "तपाईंको स्वास्थ्य",
+        hero_title: "हाम्रो प्राथमिकता हो",
+        hero_desc1: "हामी प्रत्येक बिरामीको विशिष्ट आवश्यकता अनुसार समग्र स्वास्थ्य सेवा प्रदान गर्दछौं। आधुनिक सञ्चार, उत्कृष्टताको प्रतिबद्धता, र सहानुभूतिपूर्ण हेरचाहलाई जोडेर, हामी टेलिमेडिसिनमार्फत दिगो र मापनयोग्य स्वास्थ्य परिणामहरू उत्पादन गर्न प्रयास गर्दछौं। हाम्रो दृष्टिकोणले बिरामीको सुरक्षा र पहुँचलाई प्राथमिकता दिन्छ।",
+        hero_desc2: "हाम्रो मिशन नवप्रवर्तनद्वारा बिरामी हेरचाह र चिकित्सा सेवामा विश्वसनीय स्वास्थ्य साझेदार बन्नु हो। उच्च दक्ष पेशेवर टोली र उन्नत प्रविधिको सहायताले हामी स्वास्थ्य सेवा वितरणको भविष्य निर्माण गर्न चाहन्छौं, जसले व्यक्तिहरू र समुदायलाई स्वस्थ र खुशी जीवन जिउन सक्षम बनाउँछ।",
+        about_title: "MedSaathi उत्कृष्टता बारे जान्नुहोस्",
+        about_desc1: "सुस्मा गोदावरी कलेजमा आयोजित <strong>“Godawari HackS”</strong> कार्यक्रममा जन्मिएको MedSaathi, जनतालाई साँच्चै आवश्यक सेवा प्रदान गर्न तत्पर छ।",
+        about_desc2: "हामी गुणस्तरीय स्वास्थ्य सेवा सबैका लागि पहुँचयोग्य बनाउन विश्वास गर्छौं, विशेष गरी ग्रामीण र कम सेवायुक्त समुदायहरूमा।",
+        about_button: "हाम्रो मेडिकल टीम",
+        stat1_label: "घण्टा उत्कृष्टता",
+        stat2_label: "सन्तुष्ट बिरामीहरू",
+        stat3_label: "पूरा गरिएका उपचारहरू",
+        stat4_label: "चिकित्सकीय विशेषज्ञहरू"
+    }
+};
+
+function applyPageLanguage(lang) {
+    document.querySelectorAll("[data-key]").forEach(el => {
+        const key = el.getAttribute("data-key");
+        if(pageTranslations[lang][key]) {
+            el.innerHTML = pageTranslations[lang][key];
+        }
+    });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const lang = localStorage.getItem("siteLang") || "en";
+    applyPageLanguage(lang);
+});
+</script>
+
+
+
+    <script>
+        // Intersection Observer for stats animation
+        const statsSection = document.querySelector('.stats-section');
+        let hasAnimated = false;
+
+        const animateNumber = (element) => {
+            const target = parseInt(element.getAttribute('data-target'));
+            const duration = 1500;
+            const increment = target / (duration / 16);
+            let current = 0;
+
+            const updateNumber = () => {
+                current += increment;
+                if (current < target) {
+                    element.textContent = Math.floor(current) + '+';
+                    requestAnimationFrame(updateNumber);
+                } else {
+                    element.textContent = target + '+';
+                }
+            };
+
+            updateNumber();
+        };
+
+        const statObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('reveal-stat');
+                    if (!hasAnimated) {
+                        hasAnimated = true;
+                        const statNumbers = document.querySelectorAll('.stat-number');
+                        statNumbers.forEach(statNumber => {
+                            animateNumber(statNumber);
+                        });
+                    }
+                }
+            });
+        }, { threshold: 0.3 });
+
+        document.querySelectorAll('.stat-card').forEach(card => {
+            statObserver.observe(card);
+        });
+    </script>
+
+</body>
+{% endblock %}

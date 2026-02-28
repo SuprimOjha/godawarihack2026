@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>{% block title %}MMedSaathi - Book Appointments{% endblock %}</title>
+        {% block extra_css %}
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #2c5364 0%, #203a43 50%, #0f2027 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        main {
+            margin-top: 2rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .page-header p {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        #cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #6aab32, #57B7D0);
+            transform: scaleX(0);
+            transition: transform 0.5s ease;
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 20px 60px rgba(87, 183, 208, 0.4);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #57B7D0 0%, #2c8da0 100%);
+            color: white;
+            padding: 30px 25px;
+            text-align: center;
+            position: relative;
+            transition: all 0.5s ease;
+        }
+
+        .card:hover .card-header {
+            background: linear-gradient(135deg, #6aab32 0%, #5a9629 100%);
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .status-badge.active {
+            background: rgba(106, 171, 50, 0.9);
+        }
+
+        .status-badge.inactive {
+            background: rgba(255, 107, 107, 0.9);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-badge.active .status-dot {
+            background: #fff;
+        }
+
+        .status-badge.inactive .status-dot {
+            background: #fff;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .card-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+            background: white;
+            transition: all 0.4s ease;
+        }
+
+        .card:hover .card-image {
+            transform: scale(1.1);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-name {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .card-specialty {
+            font-size: 1rem;
+            opacity: 0.95;
+            font-weight: 500;
+        }
+
+        .card-body {
+            padding: 0 25px;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card:hover .card-body {
+            max-height: 600px;
+            opacity: 1;
+            padding: 25px;
+        }
+
+        .card-info {
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            color: #555;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: all 0.4s ease;
+        }
+
+        .card:hover .info-item {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .card:hover .info-item:nth-child(1) { transition-delay: 0.1s; }
+        .card:hover .info-item:nth-child(2) { transition-delay: 0.15s; }
+        .card:hover .info-item:nth-child(3) { transition-delay: 0.2s; }
+        .card:hover .info-item:nth-child(4) { transition-delay: 0.25s; }
+        .card:hover .info-item:nth-child(5) { transition-delay: 0.3s; }
+
+        .info-item i {
+            width: 24px;
+            color: #57B7D0;
+            font-size: 1rem;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .info-label {
+            font-weight: 600;
+            margin-right: 8px;
+            min-width: 110px;
+            flex-shrink: 0;
+        }
+
+        .card-rating {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.4s ease 0.35s;
+        }
+
+        .card:hover .card-rating {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .stars {
+            color: #FFC107;
+            margin-right: 10px;
+        }
+
+        .rating-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .rating-count {
+            color: #777;
+            font-size: 0.9rem;
+            margin-left: 5px;
+        }
+
+        .card-bio {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.4s ease 0.4s;
+        }
+
+        .card:hover .card-bio {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card-footer {
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card:hover .card-footer {
+            padding: 0 25px 25px;
+            max-height: 100px;
+            opacity: 1;
+        }
+
+        .appointment-btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #6aab32 0%, #5a9629 100%);
+            color: white;
+            border: none;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+            transform: translateY(10px);
+        }
+
+        .card:hover .appointment-btn {
+            transform: translateY(0);
+        }
+
+        .appointment-btn:hover {
+            background: linear-gradient(135deg, #5a9629 0%, #4d7f23 100%);
+            box-shadow: 0 8px 20px rgba(106, 171, 50, 0.4);
+        }
+
+        .appointment-btn i {
+            margin-right: 10px;
+        }
+
+        .footer-info {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            padding: 30px;
+            margin-top: 20px;
+        }
+
+        .footer-info p {
+            margin-bottom: 10px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 40px;
+            border-radius: 20px;
+            width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #777;
+            transition: all 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: #333;
+            transform: rotate(90deg);
+        }
+
+        .modal h2 {
+            color: #57B7D0;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #eaeaea;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #57B7D0;
+            box-shadow: 0 0 0 3px rgba(87, 183, 208, 0.1);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn-confirm {
+            flex: 1;
+            padding: 16px;
+            background: linear-gradient(135deg, #6aab32 0%, #5a9629 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-cancel {
+            flex: 1;
+            padding: 16px;
+            background: #f8f9fa;
+            color: #555;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-confirm:hover {
+            background: linear-gradient(135deg, #5a9629 0%, #4d7f23 100%);
+            transform: translateY(-2px);
+        }
+
+        .btn-cancel:hover {
+            background: #e9ecef;
+        }
+
+        .confirmation-message {
+            text-align: center;
+            padding: 20px;
+            background: #f0f9ff;
+            border-radius: 10px;
+            border-left: 4px solid #6aab32;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            #cards-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+        {% endblock %}
+
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    <main>
+        {% block content %}
+        <div class="container">
+        <div class="page-header">
+            <h1>Our Medical Specialists</h1>
+            <p>Browse the doctors of your liking in the ocean on your hand.</p>
+        </div>
+
+        <div id="cards-container"></div>
+
+        <div class="footer-info">
+            <p><i class="fas fa-info-circle"></i> Need help choosing a doctor? Call our support at +977-1-1234567</p>
+            <p>All doctors are verified and licensed to practice in Nepal</p>
+        </div>
+    </div>
+
+    <!-- Appointment Modal -->
+    <div id="appointmentModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="modalDoctorName">Book Appointment</h2>
+            <form id="appointmentForm">
+                <div class="form-group">
+                    <label for="patientName">Your Full Name</label>
+                    <input type="text" id="patientName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="patientEmail">Email Address</label>
+                    <input type="email" id="patientEmail" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="patientPhone">Phone Number</label>
+                    <input type="tel" id="patientPhone" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="appointmentDate">Preferred Date</label>
+                    <input type="date" id="appointmentDate" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="appointmentTime">Preferred Time</label>
+                    <select id="appointmentTime" required>
+                        <option value="">Select a time</option>
+                        <option value="09:00">09:00 AM</option>
+                        <option value="10:00">10:00 AM</option>
+                        <option value="11:00">11:00 AM</option>
+                        <option value="14:00">02:00 PM</option>
+                        <option value="15:00">03:00 PM</option>
+                        <option value="16:00">04:00 PM</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="consultationType">Consultation Type</label>
+                    <select id="consultationType" required>
+                        <option value="">Select type</option>
+                        <option value="online">Online Consultation</option>
+                        <option value="clinic">In-Clinic Visit</option>
+                        <option value="home">Home Visit (if available)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="healthIssue">Brief Description of Health Issue</label>
+                    <textarea id="healthIssue" rows="3"></textarea>
+                </div>
+                
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancel">Cancel</button>
+                    <button type="submit" class="btn-confirm">Confirm Booking</button>
+                </div>
+            </form>
+            
+            <div id="confirmationMessage" class="confirmation-message" style="display: none;">
+                <h3><i class="fas fa-check-circle" style="color: #6aab32;"></i> Appointment Booked Successfully!</h3>
+                <p>You will receive a confirmation email shortly with appointment details.</p>
+            </div>
+        </div>
+    </div>
+
+        {% endblock %}
+    </main>
+
+    {% include 'footer.html' %}
+    <script>
+        const doctors = [
+            {
+                id: 1, 
+                pfp: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80", 
+                name: "Dr. Devid Basnet", 
+                specialty: "Gynecologist", 
+                qualification: "MD, MBA, Fellowship in Reproductive Medicine",
+                experience: "12 years",
+                languages: ["English", "Nepali", "Hindi"],
+                rating: 4.8,
+                ratingCount: 127,
+                isActive: true,
+                consultationFee: "Rs. 1500",
+                location: "MediCare Hospital, Kathmandu",
+                bio: "Specialized in women's health, reproductive medicine, and prenatal care. Available for both online and in-person consultations."
+            },
+            {
+                id: 2, 
+                pfp: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80", 
+                name: "Dr. Nalina Khanal", 
+                specialty: "Neurologist", 
+                qualification: "MD, DM Neurology, PhD Neuroscience",
+                experience: "15 years",
+                languages: ["English", "Nepali"],
+                rating: 4.9,
+                ratingCount: 203,
+                isActive: false,
+                consultationFee: "Rs. 2000",
+                location: "Neuro Care Center, Pokhara",
+                bio: "Expert in neurological disorders, stroke management, and headache disorders. Provides comprehensive neurological evaluations."
+            },
+            {
+                id: 3, 
+                pfp: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80", 
+                name: "Dr. Rajesh Sharma", 
+                specialty: "Cardiologist", 
+                qualification: "MD, DM Cardiology",
+                experience: "18 years",
+                languages: ["English", "Nepali", "Maithili"],
+                rating: 4.7,
+                ratingCount: 189,
+                isActive: true,
+                consultationFee: "Rs. 1800",
+                location: "Heart Institute, Biratnagar",
+                bio: "Specialized in interventional cardiology, heart failure management, and preventive cardiology."
+            },
+            {
+                id: 4, 
+                pfp: "https://images.unsplash.com/photo-1527613426441-4da17471b66d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80", 
+                name: "Dr. Anita Gurung", 
+                specialty: "Pediatrician", 
+                qualification: "MD Pediatrics",
+                experience: "10 years",
+                languages: ["English", "Nepali", "Gurung"],
+                rating: 4.6,
+                ratingCount: 156,
+                isActive: true,
+                consultationFee: "Rs. 1200",
+                location: "Children's Health Clinic, Chitwan",
+                bio: "Specialized in child healthcare, vaccination, and growth monitoring. Provides compassionate care for children of all ages."
+            },
+            {
+                id: 5, 
+                pfp: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80", 
+                name: "Dr. Suresh Thapa", 
+                specialty: "General Physician", 
+                qualification: "MBBS, MD General Medicine",
+                experience: "14 years",
+                languages: ["English", "Nepali", "Newari"],
+                rating: 4.5,
+                ratingCount: 98,
+                isActive: false,
+                consultationFee: "Rs. 1000",
+                location: "Community Health Center, Butwal",
+                bio: "Provides comprehensive primary care, chronic disease management, and preventive health services."
+            },
+            {
+                id: 6, 
+                pfp: "https://images.unsplash.com/photo-1591604021695-0c69b7c05981?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80", 
+                name: "Dr. Meera Karki", 
+                specialty: "Dermatologist", 
+                qualification: "MD Dermatology",
+                experience: "8 years",
+                languages: ["English", "Nepali"],
+                rating: 4.8,
+                ratingCount: 142,
+                isActive: true,
+                consultationFee: "Rs. 1600",
+                location: "Skin Care Clinic, Kathmandu",
+                bio: "Specialized in skin diseases, cosmetic dermatology, and hair disorders. Provides both medical and aesthetic treatments."
+            }
+        ];
+
+        const cardsContainer = document.getElementById("cards-container");
+        const appointmentModal = document.getElementById("appointmentModal");
+        const modalDoctorName = document.getElementById("modalDoctorName");
+        const appointmentForm = document.getElementById("appointmentForm");
+        const confirmationMessage = document.getElementById("confirmationMessage");
+        const closeModal = document.querySelector(".close-modal");
+        const cancelBtn = document.querySelector(".btn-cancel");
+
+        renderDoctors(doctors);
+
+        function renderDoctors(doctorsArray) {
+            cardsContainer.innerHTML = '';
+            
+            doctorsArray.forEach(doctor => {
+                let starsHtml = '';
+                const fullStars = Math.floor(doctor.rating);
+                const hasHalfStar = doctor.rating % 1 >= 0.5;
+                
+               
+                
+                const languagesHtml = doctor.languages.map(lang => `<span>${lang}</span>`).join(', ');
+                const statusClass = doctor.isActive ? 'active' : 'inactive';
+                const statusText = doctor.isActive ? 'Active' : 'Offline';
+                
+                cardsContainer.innerHTML += `
+                    <div class="card" data-id="${doctor.id}">
+                        <div class="card-header">
+                            <div class="status-badge ${statusClass}">
+                                <span class="status-dot"></span>
+                                ${statusText}
+                            </div>
+                            <div class="card-image">
+                                <img src="${doctor.pfp}" alt="${doctor.name}">
+                            </div>
+                            <div class="card-name">${doctor.name}</div>
+                            <div class="card-specialty">${doctor.specialty}</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-info">
+                                <div class="info-item">
+                                    <i class="fas fa-graduation-cap"></i>
+                                    <span class="info-label">Qualification:</span>
+                                    <span>${doctor.qualification}</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-briefcase"></i>
+                                    <span class="info-label">Experience:</span>
+                                    <span>${doctor.experience}</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-language"></i>
+                                    <span class="info-label">Languages:</span>
+                                    <span>${languagesHtml}</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span class="info-label">Location:</span>
+                                    <span>${doctor.location}</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-rupee-sign"></i>
+                                    <span class="info-label">Fee:</span>
+                                    <span>${doctor.consultationFee}</span>
+                                </div>
+                            </div>
+                            
+                          
+                            
+                            <p class="card-bio">${doctor.bio}</p>
+                        </div>
+                        <div class="card-footer">
+                            <button class="appointment-btn" data-id="${doctor.id}">
+                                <i class="fas fa-calendar-check"></i> Book Appointment
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            document.querySelectorAll('.appointment-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const doctorId = parseInt(this.getAttribute('data-id'));
+                    openAppointmentModal(doctorId);
+                });
+            });
+        }
+
+        function openAppointmentModal(doctorId) {
+            const doctor = doctors.find(d => d.id === doctorId);
+            if (!doctor) return;
+            
+            modalDoctorName.textContent = `Book Appointment with ${doctor.name}`;
+            appointmentForm.reset();
+            appointmentForm.style.display = 'block';
+            confirmationMessage.style.display = 'none';
+            appointmentModal.style.display = 'flex';
+            
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('appointmentDate').min = today;
+        }
+
+        function closeAppointmentModal() {
+            appointmentModal.style.display = 'none';
+        }
+
+        appointmentForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                doctorName: modalDoctorName.textContent.replace('Book Appointment with ', ''),
+                patientName: document.getElementById('patientName').value,
+                patientEmail: document.getElementById('patientEmail').value,
+                patientPhone: document.getElementById('patientPhone').value,
+                appointmentDate: document.getElementById('appointmentDate').value,
+                appointmentTime: document.getElementById('appointmentTime').value,
+                consultationType: document.getElementById('consultationType').value,
+                healthIssue: document.getElementById('healthIssue').value
+            };
+            
+            console.log('Appointment booked:', formData);
+            
+            appointmentForm.style.display = 'none';
+            confirmationMessage.style.display = 'block';
+            
+            setTimeout(() => {
+                closeAppointmentModal();
+            }, 3000);
+        });
+
+        closeModal.addEventListener('click', closeAppointmentModal);
+        cancelBtn.addEventListener('click', closeAppointmentModal);
+        
+        window.addEventListener('click', function(e) {
+            if (e.target === appointmentModal) {
+                closeAppointmentModal();
+            }
+        });
+    </script>
+</body>
+</html>

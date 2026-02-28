@@ -1,0 +1,706 @@
+{% extends 'base.html' %}
+{% block title %}
+    MedSaathi - Healthcare That Reaches Everyone
+{% endblock %}
+{% block extra_css %}
+<style>
+    /* Keep all your existing CSS intact, no changes made here */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: #ffffff;
+        overflow-x: hidden;
+    }
+    /* Hero Section - Sticky with fade effect */
+    .hero-section {
+        position: sticky;
+        top: 0;
+        width: 100%;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        padding-top: 70px;
+        transition: opacity 0.3s ease-out;
+    }
+    /* Background image with overlay */
+    .hero-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: 
+            linear-gradient(135deg, rgba(44, 95, 124, 0.85) 0%, rgba(26, 41, 71, 0.75) 100%),
+            url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1600&q=80') center/cover no-repeat;
+        z-index: 1;
+        animation: slowZoom 30s ease-in-out infinite alternate;
+    }
+    @keyframes slowZoom {
+        0% { transform: scale(1); }
+        100% { transform: scale(1.05); }
+    }
+    .hero-section::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 20% 30%, rgba(106, 171, 50, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+        z-index: 2;
+        animation: pulseOverlay 8s ease-in-out infinite;
+    }
+    @keyframes pulseOverlay {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 1; }
+    }
+    .hero-content {
+        position: relative;
+        z-index: 10;
+        max-width: 1200px;
+        width: 90%;
+        padding: 2rem;
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 4rem;
+        align-items: center;
+    }
+    .hero-text {
+        color: white;
+    }
+    .hero-text h1 {
+        font-size: 3.8rem;
+        margin-bottom: 1.5rem;
+        line-height: 1.2;
+        font-weight: 700;
+        opacity: 0;
+        transform: translateY(30px);
+        animation: fadeInUp 1s ease-out 0.3s forwards;
+    }
+    .hero-text h1 .highlight {
+        color: #6aab32;
+        display: block;
+        text-shadow: 0 0 30px rgba(106, 171, 50, 0.5);
+    }
+    .slogan-container {
+        min-height: 80px;
+        margin-bottom: 2rem;
+    }
+    .slogan {
+        font-size: 1.4rem;
+        color: #e8f5e9;
+        font-weight: 400;
+        line-height: 1.6;
+        opacity: 0;
+        animation: fadeIn 0.5s ease-out 1.5s forwards;
+    }
+    .typing-text {
+        border-right: 3px solid #6aab32;
+        white-space: nowrap;
+        overflow: hidden;
+        display: inline-block;
+        animation: typing 3.5s steps(70) 2s forwards, blink 0.75s step-end infinite;
+    }
+    @keyframes typing {
+        from { width: 0; }
+        to { width: 100%; }
+    }
+    @keyframes blink {
+        50% { border-color: transparent; }
+    }
+    .hero-text p {
+        font-size: 1.15rem;
+        color: #d5e8d4;
+        margin-bottom: 2.5rem;
+        line-height: 1.9;
+        opacity: 0;
+        animation: fadeInUp 1s ease-out 1.8s forwards;
+    }
+    .hero-buttons {
+        display: flex;
+        gap: 1.5rem;
+        opacity: 0;
+        animation: fadeInUp 1s ease-out 2.1s forwards;
+    }
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    @keyframes fadeIn {
+        to { opacity: 1; }
+    }
+    .btn-primary {
+        background: #6aab32;
+        color: white;
+        padding: 1.1rem 2.8rem;
+        border: none;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.4s;
+        box-shadow: 0 10px 30px rgba(106, 171, 50, 0.4);
+        position: relative;
+        overflow: hidden;
+    }
+    .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+    .btn-primary:hover::before {
+        width: 300px;
+        height: 300px;
+    }
+    .btn-primary:hover {
+        background: #5e972c;
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(106, 171, 50, 0.5);
+    }
+    .btn-secondary {
+        background: transparent;
+        color: white;
+        padding: 1.1rem 2.8rem;
+        border: 2px solid white;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.4s;
+        position: relative;
+        overflow: hidden;
+    }
+    .btn-secondary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        transition: left 0.5s;
+    }
+    .btn-secondary:hover::before {
+        left: 100%;
+    }
+    .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-3px);
+        border-color: #6aab32;
+        color: #6aab32;
+    }
+    .hero-features {
+        position: relative;
+        opacity: 0;
+        animation: fadeInRight 1s ease-out 0.8s forwards;
+    }
+    @keyframes fadeInRight {
+        from {
+            opacity: 0;
+            transform: translateX(50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    .feature-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .feature-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 1.5rem;
+        transition: all 0.4s;
+        cursor: pointer;
+    }
+    .feature-card:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateX(-10px);
+        border-color: #6aab32;
+        box-shadow: -10px 10px 40px rgba(106, 171, 50, 0.2);
+    }
+    .feature-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #6aab32 0%, #5e972c 100%);
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        transition: transform 0.4s;
+    }
+    .feature-card:hover .feature-icon {
+        transform: rotate(10deg) scale(1.1);
+    }
+    .feature-icon svg {
+        width: 30px;
+        height: 30px;
+        color: white;
+    }
+    .feature-card h3 {
+        font-size: 1.2rem;
+        color: white;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+    .feature-card p {
+        font-size: 0.95rem;
+        color: #d5e8d4;
+        line-height: 1.6;
+    }
+    .trust-badge {
+        margin-top: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
+        background: rgba(106, 171, 50, 0.2);
+        border-radius: 15px;
+        border: 1px solid rgba(106, 171, 50, 0.3);
+    }
+    .trust-badge-icon {
+        width: 40px;
+        height: 40px;
+        background: #6aab32;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+    .trust-badge-icon svg {
+        width: 20px;
+        height: 20px;
+        color: white;
+    }
+    .trust-badge-text {
+        color: white;
+        font-size: 0.9rem;
+    }
+    .trust-badge-text strong {
+        display: block;
+        font-size: 1.1rem;
+        margin-bottom: 0.2rem;
+    }
+    .scroll-indicator {
+        position: absolute;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 15;
+        animation: bounce 2s infinite;
+        cursor: pointer;
+    }
+    .scroll-indicator::after {
+        content: '↓';
+        color: white;
+        font-size: 2rem;
+        opacity: 0.7;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+        40% { transform: translateX(-50%) translateY(-10px); }
+        60% { transform: translateX(-50%) translateY(-5px); }
+    }
+    .why-us-section {
+        background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
+        padding: 6rem 5%;
+        position: relative;
+        z-index: 100;
+        transform: translateY(0);
+    }
+    .section-title {
+        text-align: center;
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #2C5F7C;
+        font-weight: 700;
+    }
+    .section-subtitle {
+        text-align: center;
+        font-size: 1.2rem;
+        color: #666;
+        margin-bottom: 4rem;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .cards-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+    }
+    .card {
+        background: white;
+        border: 2px solid #e8f0f2;
+        border-radius: 20px;
+        padding: 2.5rem 2rem;
+        text-align: center;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 5px 20px rgba(44, 95, 124, 0.08);
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    .card.reveal-card {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .card:nth-child(1) { transition-delay: 0.1s; }
+    .card:nth-child(2) { transition-delay: 0.2s; }
+    .card:nth-child(3) { transition-delay: 0.3s; }
+    .card:nth-child(4) { transition-delay: 0.4s; }
+    .card:nth-child(5) { transition-delay: 0.5s; }
+    .card:nth-child(6) { transition-delay: 0.6s; }
+    .card:hover {
+        transform: translateY(-15px) scale(1.02);
+        box-shadow: 0 20px 50px rgba(106, 171, 50, 0.25);
+        border-color: #6aab32;
+        background: linear-gradient(135deg, #f0f9f4 0%, #e8f5e9 100%);
+    }
+    .card-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #2C5F7C 0%, #3d7a9e 100%);
+        border-radius: 50%;
+        margin: 0 auto 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.6s ease;
+        box-shadow: 0 8px 20px rgba(44, 95, 124, 0.3);
+    }
+    .card:hover .card-icon {
+        transform: rotateY(180deg);
+        background: linear-gradient(135deg, #6aab32 0%, #5e972c 100%);
+        box-shadow: 0 10px 30px rgba(106, 171, 50, 0.4);
+    }
+    .card-icon svg {
+        width: 40px;
+        height: 40px;
+        color: white;
+    }
+    .card h3 {
+        font-size: 1.4rem;
+        margin-bottom: 1rem;
+        color: #2C5F7C;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+    .card:hover h3 {
+        color: #6aab32;
+    }
+    .card p {
+        color: #666;
+        line-height: 1.8;
+        font-size: 0.95rem;
+        transition: color 0.3s ease;
+    }
+    .card:hover p {
+        color: #555;
+    }
+    @media (max-width: 968px) {
+        .hero-content {
+            grid-template-columns: 1fr;
+            gap: 3rem;
+        }
+        .hero-text h1 {
+            font-size: 2.8rem;
+        }
+        .cards-container {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    @media (max-width: 768px) {
+        .navbar {
+            padding: 1rem 3%;
+        }
+        .nav-links {
+            display: none;
+        }
+        .hero-text h1 {
+            font-size: 2.2rem;
+        }
+        .slogan {
+            font-size: 1.1rem;
+        }
+        .typing-text {
+            white-space: normal;
+        }
+        .hero-buttons {
+            flex-direction: column;
+        }
+        .btn-primary, .btn-secondary {
+            width: 100%;
+        }
+        .cards-container {
+            grid-template-columns: 1fr;
+        }
+        .hero-content {
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+        <div class="hero-text">
+            <h1 data-key="hero_title">Healthcare That Reaches Everyone</h1>
+            <div class="slogan-container">
+                <p class="slogan" data-key="hero_slogan">Bridging the Gap Between Rural Communities and Quality Medical Care</p>
+            </div>
+            <p data-key="hero_desc">We bring modern healthcare solutions to remote areas through innovative telemedicine and community health programs. Our mission is to ensure every individual, regardless of location, has access to the medical care they deserve.</p>
+        </div>
+        <div class="hero-features">
+            <div class="feature-cards">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h3 data-key="feature1_title">Cheap Health Checkups</h3>
+                    <p data-key="feature1_desc">Cheap health consultations with professional doctors right on the palm of your hand.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                    </div>
+                    <h3 data-key="feature2_title">Ease of access</h3>
+                    <p data-key="feature2_desc">As a bridge between rural areas to modern healthcare solutions, it provides easy access to medical services.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </div>
+                    <h3 data-key="feature3_title">Online appointments</h3>
+                    <p data-key="feature3_desc">Book appointments online with your preferred healthcare provider from the comfort of your home.</p>
+                </div>
+            </div>
+            <div class="trust-badge">
+                <div class="trust-badge-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                </div>
+                <div class="trust-badge-text">
+                    <strong data-key="trust_title">Trusted by 50,000+ Patients</strong>
+                    <span data-key="trust_desc">Certified healthcare professionals committed to your wellbeing</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="scroll-indicator"></div>
+</section>
+
+<!-- Why Us Section -->
+<section class="why-us-section">
+    <h2 class="section-title" data-key="why_title">Why Choose Us</h2>
+    <p class="section-subtitle" data-key="why_subtitle">Comprehensive healthcare solutions designed specifically for rural and underserved communities</p>
+    <div class="cards-container">
+        <div class="card">
+            <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /> </svg></div>
+            <h3 data-key="why1_title">Telemedicine Access</h3>
+            <p data-key="why1_desc">Connect with qualified healthcare professionals remotely through our advanced telemedicine platform, bringing expert medical consultation to you.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /> </svg></div>
+            <h3 data-key="why2_title">24/7 Availability</h3>
+            <p data-key="why2_desc">Through our platform's large reach with health experts, you are facilitated with health services round the clock.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg></div>
+            <h3 data-key="why3_title">Community Health Workers</h3>
+            <p data-key="why3_desc">Trained local health workers in rural communities provide essential care, health education, and serve as vital links to our medical network.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /> </svg></div>
+            <h3 data-key="why4_title">Affordable Care</h3>
+            <p data-key="why4_desc">We believe healthcare is a right, not a privilege. Our services are designed to be accessible and affordable for all community members.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /> </svg></div>
+            <h3 data-key="why5_title">Digital Health Records</h3>
+            <p data-key="why5_desc">Secure digital health records ensure your medical history is safely stored and easily accessible to healthcare providers when needed.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /> </svg></div>
+            <h3 data-key="why6_title">Quick Response</h3>
+            <p data-key="why6_desc">Emergency medical support with rapid response times, ensuring critical care reaches patients in remote areas when every second counts.</p>
+        </div>
+    </div>
+</section>
+
+<script>
+const translations = {
+    en: {
+        hero_title: "Healthcare That Reaches Everyone",
+        hero_slogan: "Bridging the Gap Between Rural Communities and Quality Medical Care",
+        hero_desc: "We bring modern healthcare solutions to remote areas through innovative telemedicine and community health programs. Our mission is to ensure every individual, regardless of location, has access to the medical care they deserve.",
+        feature1_title: "Cheap Health Checkups",
+        feature1_desc: "Cheap health consultations with professional doctors right on the palm of your hand.",
+        feature2_title: "Ease of access",
+        feature2_desc: "As a bridge between rural areas to modern healthcare solutions, it provides easy access to medical services.",
+        feature3_title: "Online appointments",
+        feature3_desc: "Book appointments online with your preferred healthcare provider from the comfort of your home.",
+        trust_title: "Trusted by 50,000+ Patients",
+        trust_desc: "Certified healthcare professionals committed to your wellbeing",
+        why_title: "Why Choose Us",
+        why_subtitle: "Comprehensive healthcare solutions designed specifically for rural and underserved communities",
+        why1_title: "Telemedicine Access",
+        why1_desc: "Connect with qualified healthcare professionals remotely through our advanced telemedicine platform, bringing expert medical consultation to you.",
+        why2_title: "24/7 Availability",
+        why2_desc: "Through our platform's large reach with health experts, you are facilitated with health services round the clock.",
+        why3_title: "Community Health Workers",
+        why3_desc: "Trained local health workers in rural communities provide essential care, health education, and serve as vital links to our medical network.",
+        why4_title: "Affordable Care",
+        why4_desc: "We believe healthcare is a right, not a privilege. Our services are designed to be accessible and affordable for all community members.",
+        why5_title: "Digital Health Records",
+        why5_desc: "Secure digital health records ensure your medical history is safely stored and easily accessible to healthcare providers when needed.",
+        why6_title: "Quick Response",
+        why6_desc: "Emergency medical support with rapid response times, ensuring critical care reaches patients in remote areas when every second counts."
+    },
+    ne: {
+        hero_title: "स्वास्थ्य सेवा जसले सबैलाई समेट्छ",
+        hero_slogan: "ग्रामीण समुदाय र गुणस्तरीय चिकित्सा सेवाबीचको दूरी घटाउँदै",
+        hero_desc: "हामी नवीन टेलिमेडिसिन र सामुदायिक स्वास्थ्य कार्यक्रममार्फत दुर्गम क्षेत्रमा आधुनिक स्वास्थ्य सेवा पुर्‍याउँछौं। हाम्रो लक्ष्य स्थानको पर्वाह नगरी सबैलाई आवश्यक चिकित्सा सेवा उपलब्ध गराउनु हो।",
+        feature1_title: "सस्तो स्वास्थ्य जाँच",
+        feature1_desc: "अनुभवी डाक्टरहरूसँग सस्तो स्वास्थ्य परामर्श तपाईंको हातमै।",
+        feature2_title: "सजिलो पहुँच",
+        feature2_desc: "ग्रामीण क्षेत्रलाई आधुनिक स्वास्थ्य सेवासँग जोड्दै सजिलो र भरपर्दो सेवा प्रदान गर्दछ।",
+        feature3_title: "अनलाइन अपोइन्टमेन्ट",
+        feature3_desc: "घरमै बसेर आफ्नो मनपर्ने स्वास्थ्य सेवा प्रदायकसँग अपोइन्टमेन्ट बुक गर्नुहोस्।",
+        trust_title: "५०,०००+ बिरामीहरूको विश्वास",
+        trust_desc: "तपाईंको स्वास्थ्यप्रति प्रतिबद्ध प्रमाणित स्वास्थ्यकर्मीहरू",
+        why_title: "हामीलाई किन रोज्ने?",
+        why_subtitle: "ग्रामीण तथा सेवाबाट वञ्चित समुदायका लागि विशेष रूपमा तयार पारिएका स्वास्थ्य समाधानहरू",
+        why1_title: "टेलिमेडिसिन पहुँच",
+        why1_desc: "उन्नत टेलिमेडिसिन प्लेटफर्ममार्फत अनुभवी स्वास्थ्यकर्मीहरूसँग टाढैबाट परामर्श लिनुहोस्।",
+        why2_title: "२४/७ उपलब्धता",
+        why2_desc: "हाम्रो स्वास्थ्य विशेषज्ञहरूको विशाल सञ्जालमार्फत चौबीसै घण्टा सेवा उपलब्ध।",
+        why3_title: "सामुदायिक स्वास्थ्यकर्मी",
+        why3_desc: "स्थानीय रूपमा प्रशिक्षित स्वास्थ्यकर्मीहरूले आवश्यक उपचार, स्वास्थ्य शिक्षा र चिकित्सा सञ्जालसँगको सेतुको भूमिका निभाउँछन्।",
+        why4_title: "सुलभ स्वास्थ्य सेवा",
+        why4_desc: "हामी स्वास्थ्य सेवालाई अधिकार मान्दछौं। त्यसैले हाम्रो सेवा सबैका लागि पहुँचयोग्य र सुलभ बनाइएको छ।",
+        why5_title: "डिजिटल स्वास्थ्य अभिलेख",
+        why5_desc: "सुरक्षित डिजिटल अभिलेखले तपाईंको स्वास्थ्य इतिहास सुरक्षित र आवश्यक पर्दा सजिलै उपलब्ध गराउँछ।",
+        why6_title: "छिटो प्रतिक्रिया",
+        why6_desc: "आपतकालीन अवस्थामा छिटो प्रतिक्रिया दिँदै दुर्गम क्षेत्रमा समेत समयमै उपचार सुनिश्चित गर्दछ।"
+    }
+};
+
+function applyLanguage(lang) {
+    document.querySelectorAll("[data-key]").forEach(el => {
+        const key = el.getAttribute("data-key");
+        if (translations[lang][key]) el.innerText = translations[lang][key];
+    });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const lang = localStorage.getItem("siteLang") || "en";
+    applyLanguage(lang);
+});
+</script>
+
+
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Hero section fade effect on scroll
+        window.addEventListener('scroll', () => {
+            const heroSection = document.querySelector('.hero-section');
+            const scrollPosition = window.scrollY;
+            const windowHeight = window.innerHeight;
+            
+            // Calculate opacity based on scroll position
+            // Starts fading when user scrolls past 30% of viewport height
+            const fadeStart = windowHeight * 0.3;
+            const fadeEnd = windowHeight * 0.8;
+            
+            if (scrollPosition <= fadeStart) {
+                heroSection.style.opacity = '1';
+            } else if (scrollPosition >= fadeEnd) {
+                heroSection.style.opacity = '0';
+            } else {
+                const fadeProgress = (scrollPosition - fadeStart) / (fadeEnd - fadeStart);
+                heroSection.style.opacity = 1 - fadeProgress;
+            }
+        });
+
+        // Cards reveal animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const cardObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('reveal-card');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all cards
+        document.querySelectorAll('.card').forEach(card => {
+            cardObserver.observe(card);
+        });
+
+        // Smooth scroll for scroll indicator
+        document.querySelector('.scroll-indicator').addEventListener('click', () => {
+            document.querySelector('.why-us-section').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        });
+    </script>
+
+{% endblock %}
+</body>

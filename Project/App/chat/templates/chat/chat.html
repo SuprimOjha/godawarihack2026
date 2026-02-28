@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>{% block title %}MedSaathi - AI Health Assistant{% endblock %}</title>
+        {% block extra_css %}
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    {% load static %}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        main {
+            margin-top: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            color: #0a84c5;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(87, 183, 208, 0.2);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .warning-banner {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .warning-icon {
+            color: #856404;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .warning-content h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .warning-content p {
+            color: #666;
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+        }
+
+        .chat-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .chat-interface {
+            flex: 1 1 700px;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 15px 20px;
+            border-radius: 18px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #57B7D0 0%, #2a8da0 100%);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .ai-message {
+            align-self: flex-start;
+            background: #f0f9ff;
+            color: #333;
+            border-bottom-left-radius: 5px;
+            border: 1px solid #e1f0fa;
+        }
+
+        .ai-message strong {
+            color: #2a8da0;
+        }
+
+        .ai-message h3, .ai-message h4 {
+            color: #2a5298;
+            margin: 15px 0 10px 0;
+        }
+
+        .ai-message ul, .ai-message ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .ai-message li {
+            margin-bottom: 8px;
+        }
+
+        .message-timestamp {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        .chat-input-area {
+            padding: 20px;
+            border-top: 1px solid #eaeaea;
+            background: white;
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 15px;
+        }
+
+        #userInput {
+            flex: 1;
+            padding: 16px 20px;
+            border: 2px solid #eaeaea;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        #userInput:focus {
+            outline: none;
+            border-color: #57B7D0;
+            box-shadow: 0 0 0 3px rgba(87, 183, 208, 0.1);
+        }
+
+        .chat-button {
+            padding: 16px 30px;
+            background: #57B7D0;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+        }
+
+        .chat-button:hover {
+            background: #2a8da0;
+            transform: translateY(-2px);
+        }
+
+        .chat-button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .sidebar {
+            flex: 1 1 400px;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .sidebar h2 {
+            color: #57B7D0;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eaeaea;
+        }
+
+        .symptom-input {
+            margin-bottom: 25px;
+        }
+
+        .symptom-input textarea {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #eaeaea;
+            border-radius: 10px;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 120px;
+            transition: all 0.3s;
+        }
+
+        .symptom-input textarea:focus {
+            outline: none;
+            border-color: #57B7D0;
+            box-shadow: 0 0 0 3px rgba(87, 183, 208, 0.1);
+        }
+
+        .example-prompts {
+            margin-top: 30px;
+        }
+
+        .prompts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .prompt-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid #eaeaea;
+        }
+
+        .prompt-card:hover {
+            background: #e9f7fb;
+            border-color: #57B7D0;
+            transform: translateY(-2px);
+        }
+
+        .prompt-card i {
+            color: #57B7D0;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .prompt-card p {
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 20px;
+            background: #f0f9ff;
+            border-radius: 18px;
+            align-self: flex-start;
+            margin-top: 10px;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            background: #57B7D0;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
+            40% { transform: translateY(-10px); opacity: 1; }
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .loading i {
+            font-size: 2rem;
+            color: #57B7D0;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .footer-info {
+            text-align: center;
+            color: #777;
+            padding: 25px;
+            border-top: 1px solid #eaeaea;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 1100px) {
+            .chat-container {
+                flex-direction: column;
+            }
+            
+            .chat-interface, .sidebar {
+                flex: 1 1 auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .chat-interface {
+                height: 500px;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+            
+            .prompts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .diagnosis-result {
+            background: #f0f9ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid #57B7D0;
+            display: none;
+        }
+
+        .diagnosis-result h3 {
+            color: #2a8da0;
+            margin-bottom: 15px;
+        }
+
+        .clear-button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #f1f8ff;
+            color: #57B7D0;
+            border: 2px solid #57B7D0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .clear-button:hover {
+            background: #e1f0fa;
+        }
+
+        /* Markup rendering */
+        /* Markdown-specific styles */
+.ai-message h2 {
+    color: #2a5298;
+    font-size: 1.4rem;
+    margin: 20px 0 15px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #eaeaea;
+}
+
+.ai-message h3 {
+    color: #2a8da0;
+    font-size: 1.2rem;
+    margin: 18px 0 12px 0;
+}
+
+.ai-message h4 {
+    color: #57B7D0;
+    font-size: 1.1rem;
+    margin: 15px 0 10px 0;
+}
+
+.ai-message h4 i {
+    margin-right: 10px;
+}
+
+.ai-message ul, .ai-message ol {
+    margin-left: 25px;
+    margin-bottom: 15px;
+    padding-left: 0;
+}
+
+.ai-message li {
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+.ai-message li:before {
+    color: #57B7D0;
+    font-weight: bold;
+}
+
+.ai-message strong {
+    color: #2a8da0;
+    font-weight: 700;
+}
+
+.ai-message em {
+    color: #666;
+    font-style: italic;
+}
+
+.ai-message code {
+    background: #f8f9fa;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    color: #d63384;
+}
+
+.ai-message pre {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 15px 0;
+    border-left: 4px solid #57B7D0;
+}
+
+.ai-message pre code {
+    background: none;
+    padding: 0;
+    color: #333;
+}
+
+.ai-message blockquote {
+    border-left: 4px solid #ffc107;
+    padding: 10px 15px;
+    margin: 15px 0;
+    background: #fff9e6;
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+}
+
+.ai-message hr {
+    border: none;
+    border-top: 2px dashed #eaeaea;
+    margin: 20px 0;
+}
+
+.ai-message a {
+    color: #57B7D0;
+    text-decoration: none;
+    border-bottom: 1px dotted #57B7D0;
+    transition: all 0.3s;
+}
+
+.ai-message a:hover {
+    color: #2a8da0;
+    border-bottom: 1px solid #2a8da0;
+}
+
+/* Medical-specific styling */
+.medical-disclaimer {
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 20px 0;
+}
+
+.medical-disclaimer h4 {
+    color: #856404;
+    margin-top: 0 !important;
+}
+
+.medical-disclaimer p {
+    color: #856404;
+    margin-bottom: 0;
+}
+
+/* Emergency styling */
+.ai-message .emergency-alert {
+    background: #f8d7da;
+    border: 2px solid #f5c6cb;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px 0;
+    color: #721c24;
+}
+
+.ai-message .emergency-alert h4 {
+    color: #721c24;
+}
+
+/* Tips and notes */
+.ai-message .tip-box {
+    background: #d1ecf1;
+    border: 2px solid #bee5eb;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px 0;
+    color: #0c5460;
+}
+
+.ai-message .tip-box h4 {
+    color: #0c5460;
+}
+    </style>
+        {% endblock %}
+
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    <main>
+        {% block content %}
+        <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-robot"></i> MedSaathi AI Health Assistant</h1>
+            <p>Describe your symptoms and get AI-powered health guidance (Not a substitute for professional medical advice)</p>
+        </div>
+
+        <div class="warning-banner">
+            <i class="fas fa-exclamation-triangle warning-icon"></i>
+            <div class="warning-content">
+                <h3><i class="fas fa-skull-crossbones"></i> IMPORTANT MEDICAL DISCLAIMER</h3>
+                <p><strong>This AI assistant provides general health information only and is NOT a substitute for professional medical advice.</strong></p>
+                <p>• Always consult with a qualified healthcare provider for medical advice, diagnosis, or treatment</p>
+                <p>• In case of emergency symptoms (chest pain, difficulty breathing, severe bleeding), call emergency services immediately</p>
+                <p>• Do not disregard professional medical advice or delay seeking treatment because of information provided here</p>
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <div class="chat-interface">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message ai-message">
+                        <strong><i class="fas fa-robot"></i> MediCare+ AI Assistant:</strong><br><br>
+                        Hello! I'm your AI health assistant. I can help you understand symptoms and provide general health information.<br><br>
+                        <strong>Please tell me:</strong><br>
+                        • What symptoms are you experiencing?<br>
+                        • How long have you had them?<br>
+                        • Any other relevant information?<br><br>
+                        <em>Remember: I provide information only, not medical diagnoses.</em>
+                    </div>
+                </div>
+
+                <div class="typing-indicator" id="typingIndicator">
+                    <div class="typing-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <span>AI is thinking...</span>
+                </div>
+
+                <div class="chat-input-area">
+                    <div class="chat-input-wrapper">
+                        <input type="text" id="userInput" placeholder="Describe your symptoms or ask a health question...">
+                        <button class="chat-button" id="sendButton">
+                            <i class="fas fa-paper-plane"></i> Send
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <h2><i class="fas fa-stethoscope"></i> Quick Symptom Analysis</h2>
+                
+                <div class="symptom-input">
+                    <h3>Describe your symptoms in detail:</h3>
+                    <textarea id="symptomInput" placeholder="Example: I've had headache, fever, and body aches for 2 days. No cough, but I feel tired..."></textarea>
+                    <button class="chat-button" id="analyzeButton" style="margin-top: 15px; width: 100%;">
+                        <i class="fas fa-search-medical"></i> Analyze Symptoms
+                    </button>
+                </div>
+
+                <div class="diagnosis-result" id="diagnosisResult">
+                    <h3><i class="fas fa-file-medical-alt"></i> Analysis Results</h3>
+                    <div id="diagnosisContent"></div>
+                    <button class="clear-button" onclick="clearDiagnosis()">Clear Results</button>
+                </div>
+
+                <div class="example-prompts">
+                    <h3><i class="fas fa-lightbulb"></i> Example Questions</h3>
+                    <div class="prompts-grid">
+                        <div class="prompt-card" onclick="usePrompt('I have headache and fever since yesterday')">
+                            <i class="fas fa-head-side-virus"></i>
+                            <p>Headache with fever</p>
+                        </div>
+                        <div class="prompt-card" onclick="usePrompt('Stomach pain and diarrhea for 3 days')">
+                            <i class="fas fa-stomach"></i>
+                            <p>Stomach issues</p>
+                        </div>
+                        <div class="prompt-card" onclick="usePrompt('Cough and difficulty breathing')">
+                            <i class="fas fa-lungs"></i>
+                            <p>Respiratory problems</p>
+                        </div>
+                        <div class="prompt-card" onclick="usePrompt('Rash and itching on skin')">
+                            <i class="fas fa-allergies"></i>
+                            <p>Skin rash</p>
+                        </div>
+                        <div class="prompt-card" onclick="usePrompt('Back pain that radiates to legs')">
+                            <i class="fas fa-bone"></i>
+                            <p>Back and joint pain</p>
+                        </div>
+                        <div class="prompt-card" onclick="usePrompt('First aid for minor burn')">
+                            <i class="fas fa-first-aid"></i>
+                            <p>First aid advice</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-info">
+            <p><i class="fas fa-info-circle"></i> This AI assistant uses Gemini 2.0 Flash via OpenRouter API. Responses are AI-generated and should be verified with healthcare professionals.</p>
+            <p>MediCare+ AI Health Assistant © 2023 | <a href="/" style="color: #57B7D0;">Return to Home</a></p>
+        </div>
+    </div>
+
+        {% endblock %}
+    </main>
+
+    {% include 'footer.html' %}
+    <script>
+        // DOM Elements
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+        const chatMessages = document.getElementById('chatMessages');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const symptomInput = document.getElementById('symptomInput');
+        const analyzeButton = document.getElementById('analyzeButton');
+        const diagnosisResult = document.getElementById('diagnosisResult');
+        const diagnosisContent = document.getElementById('diagnosisContent');
+
+        // CSRF token for Django
+        function getCSRFToken() {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                const [name, value] = cookie.trim().split('=');
+                if (name === 'csrftoken') {
+                    return value;
+                }
+            }
+            return '';
+        }
+
+        // Add message to chat
+        function addMessage(message, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
+            
+            const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            let content = message;
+            if (!isUser) {
+                content = `<strong><i class="fas fa-robot"></i> MedSaathi AI Assistant:</strong><br><br>${message}`;
+            }
+            
+            messageDiv.innerHTML = `
+                ${content}
+                <div class="message-timestamp">${timestamp}</div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Show typing indicator
+        function showTyping() {
+            typingIndicator.style.display = 'flex';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Hide typing indicator
+        function hideTyping() {
+            typingIndicator.style.display = 'none';
+        }
+
+        // Enhanced sendMessage function with better formatting
+async function sendMessage(message) {
+    if (!message.trim()) return;
+    
+    // Add user message to chat (plain text)
+    addMessage(message, true);
+    userInput.value = '';
+    
+    // Show typing indicator
+    showTyping();
+    
+    try {
+        const response = await fetch('/chat/api/message/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken()
+            },
+            body: JSON.stringify({ message: message })
+        });
+        
+        const data = await response.json();
+        
+        // Hide typing indicator
+        hideTyping();
+        
+        if (data.status === 'success') {
+            // The addMessage function will automatically apply markdown formatting
+            addMessage(data.response, false);
+        } else {
+            addMessage(`Sorry, I encountered an error: ${data.error || 'Unknown error'}. Please try again.`);
+        }
+        
+    } catch (error) {
+        hideTyping();
+        addMessage('Sorry, I am having trouble connecting. Please check your internet connection and try again.');
+        console.error('Error:', error);
+    }
+}
+       // Enhanced analyzeSymptoms function
+async function analyzeSymptoms() {
+    const symptoms = symptomInput.value.trim();
+    if (!symptoms) {
+        alert('Please describe your symptoms first.');
+        return;
+    }
+    
+    // Show loading in diagnosis result area
+    diagnosisContent.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Analyzing symptoms...</div>';
+    diagnosisResult.style.display = 'block';
+    analyzeButton.disabled = true;
+    analyzeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+    
+    try {
+        const response = await fetch('/chat/api/diagnose/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken()
+            },
+            body: JSON.stringify({ symptoms: symptoms })
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            // Format the response with markdown conversion
+            let formattedResponse = markdownToHtml(data.diagnosis_info);
+            
+            // Add some medical-specific styling
+            formattedResponse = formattedResponse.replace(
+                /<strong>Disclaimer:<\/strong>/g,
+                '<div class="medical-disclaimer"><strong><i class="fas fa-info-circle"></i> Important Disclaimer:</strong>'
+            );
+            
+            diagnosisContent.innerHTML = formattedResponse;
+            
+            // Also add to chat with full formatting
+            addMessage(`I analyzed these symptoms: "${symptoms}"`, true);
+            addMessage(data.diagnosis_info);
+        } else {
+            diagnosisContent.innerHTML = `<p style="color: #dc3545;"><i class="fas fa-exclamation-circle"></i> Error: ${data.error || 'Unknown error'}</p>`;
+        }
+        
+    } catch (error) {
+        diagnosisContent.innerHTML = '<p style="color: #dc3545;"><i class="fas fa-exclamation-circle"></i> Failed to analyze symptoms. Please try again.</p>';
+        console.error('Error:', error);
+    } finally {
+        analyzeButton.disabled = false;
+        analyzeButton.innerHTML = '<i class="fas fa-search-medical"></i> Analyze Symptoms';
+        
+        // Scroll to diagnosis result
+        diagnosisResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+}
+
+        // Clear diagnosis results
+        function clearDiagnosis() {
+            diagnosisResult.style.display = 'none';
+            diagnosisContent.innerHTML = '';
+            symptomInput.value = '';
+        }
+
+        // Use example prompt
+        function usePrompt(prompt) {
+            userInput.value = prompt;
+            userInput.focus();
+        }
+
+        // Event Listeners
+        sendButton.addEventListener('click', () => {
+            sendMessage(userInput.value);
+        });
+
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage(userInput.value);
+            }
+        });
+
+        analyzeButton.addEventListener('click', analyzeSymptoms);
+
+        // Handle Enter key in symptom textarea (with Shift for new line)
+        symptomInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                analyzeSymptoms();
+            }
+        });
+
+        // Initialize chat on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            userInput.focus();
+        });
+
+function showRetryStatus(attempt, maxAttempts) {
+    const statusDiv = document.createElement('div');
+    statusDiv.className = 'retry-status';
+    statusDiv.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px; color: #ff922b;">
+            <i class="fas fa-sync-alt fa-spin"></i>
+            <span>Attempting to connect (${attempt}/${maxAttempts})...</span>
+        </div>
+    `;
+    chatMessages.appendChild(statusDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    return statusDiv;
+}
+
+// Update the sendMessage function
+async function sendMessage(message) {
+    if (!message.trim()) return;
+    
+    // Add user message to chat
+    addMessage(message, true);
+    userInput.value = '';
+    
+    // Show typing indicator
+    showTyping();
+    
+    // Show retry status indicator
+    const retryStatus = document.createElement('div');
+    retryStatus.className = 'retry-status';
+    retryStatus.innerHTML = '<div style="color: #57B7D0;"><i class="fas fa-sync-alt fa-spin"></i> Connecting to AI service...</div>';
+    chatMessages.appendChild(retryStatus);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    try {
+        const response = await fetch('/chat/api/message/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken()
+            },
+            body: JSON.stringify({ message: message })
+        });
+        
+        const data = await response.json();
+        
+        // Remove retry status
+        retryStatus.remove();
+        
+        // Hide typing indicator
+        hideTyping();
+        
+        if (data.status === 'success') {
+            addMessage(data.response);
+        } else {
+            addMessage(`Sorry, I encountered an error: ${data.error || 'Unknown error'}. Please try again.`);
+        }
+        
+    } catch (error) {
+        // Remove retry status
+        retryStatus.remove();
+        hideTyping();
+        
+        addMessage('Network error. Please check your connection and try again.');
+        console.error('Error:', error);
+    }
+}
+
+// Add CSS for retry status
+const style = document.createElement('style');
+style.textContent = `
+    .retry-status {
+        padding: 10px 20px;
+        background: #fff9e6;
+        border-radius: 10px;
+        margin: 10px 0;
+        border-left: 4px solid #ffc107;
+        font-size: 0.9rem;
+    }
+`;
+document.head.appendChild(style);
+
+// Markdown to HTML converter
+function markdownToHtml(text) {
+    if (!text) return '';
+    
+    let html = text;
+    
+    // Headers (## Header)
+    html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+    html = html.replace(/^## (.*$)/gim, '<h3>$1</h3>');
+    html = html.replace(/^# (.*$)/gim, '<h2>$1</h2>');
+    
+    // Bold and Italic
+    html = html.replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>');
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    html = html.replace(/__(.*?)__/g, '<strong>$1</strong>');
+    html = html.replace(/_(.*?)_/g, '<em>$1</em>');
+    
+    // Lists
+    html = html.replace(/^\s*[-*+] (.*$)/gim, '<li>$1</li>');
+    html = html.replace(/^\s*\d+\. (.*$)/gim, '<li>$1</li>');
+    
+    // Wrap consecutive list items in ul/ol
+    html = html.replace(/(<li>.*<\/li>)(?=\s*<li>)/g, '$1');
+    let lines = html.split('\n');
+    let inList = false;
+    let listType = 'ul';
+    
+    for (let i = 0; i < lines.length; i++) {
+        if (lines[i].includes('<li>') && !inList) {
+            inList = true;
+            lines[i] = `<${listType}>${lines[i]}`;
+        } else if (!lines[i].includes('<li>') && inList) {
+            inList = false;
+            lines[i-1] = `${lines[i-1]}</${listType}>`;
+        }
+    }
+    if (inList) {
+        lines[lines.length - 1] = `${lines[lines.length - 1]}</${listType}>`;
+    }
+    html = lines.join('\n');
+    
+    // Code blocks
+    html = html.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+    
+    // Blockquotes
+    html = html.replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>');
+    
+    // Horizontal rules
+    html = html.replace(/^\s*---\s*$/gim, '<hr>');
+    
+    // Links
+    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+    
+    // Line breaks
+    html = html.replace(/\n/g, '<br>');
+    
+    // Special formatting for health-related content
+    html = html.replace(/🚨/g, '<span style="color: #dc3545; font-size: 1.2em;">🚨</span>');
+    html = html.replace(/⚠️/g, '<span style="color: #ffc107; font-size: 1.2em;">⚠️</span>');
+    html = html.replace(/❗/g, '<span style="color: #fd7e14; font-size: 1.2em;">❗</span>');
+    html = html.replace(/💡/g, '<span style="color: #20c997; font-size: 1.2em;">💡</span>');
+    html = html.replace(/👨‍⚕️|👩‍⚕️/g, '<span style="color: #0d6efd; font-size: 1.2em;">$&</span>');
+    html = html.replace(/💊/g, '<span style="color: #6f42c1; font-size: 1.2em;">💊</span>');
+    
+    // Preserve numbered steps (1., 2., etc.)
+    html = html.replace(/(\d+\.\s+)/g, '<span style="font-weight: bold; color: #2a8da0;">$1</span>');
+    
+    // Clean up excessive line breaks
+    html = html.replace(/<br><br><br>/g, '<br><br>');
+    
+    return html;
+}
+
+// Enhanced message formatting with markdown support
+function formatMessageContent(message, isUser = false) {
+    if (isUser) {
+        // User messages are plain text
+        return message;
+    }
+    
+    // AI messages get markdown processing
+    let content = message;
+    
+    // First, check if it's a structured medical response
+    if (content.includes('**Possible Conditions:**') || 
+        content.includes('**Red Flags:**') ||
+        content.includes('**When to see a doctor:**')) {
+        
+        // Enhanced medical response formatting
+        content = content
+            .replace(/\*\*Possible Conditions:\*\*/g, '<h4 style="color: #2a5298; margin-top: 15px;"><i class="fas fa-diagnoses"></i> Possible Conditions:</h4>')
+            .replace(/\*\*Red Flags:\*\*/g, '<h4 style="color: #dc3545; margin-top: 15px;"><i class="fas fa-exclamation-triangle"></i> Red Flags (Seek Immediate Care):</h4>')
+            .replace(/\*\*When to see a doctor:\*\*/g, '<h4 style="color: #fd7e14; margin-top: 15px;"><i class="fas fa-user-md"></i> When to See a Doctor:</h4>')
+            .replace(/\*\*Self-care tips:\*\*/g, '<h4 style="color: #20c997; margin-top: 15px;"><i class="fas fa-hand-holding-heart"></i> Self-Care Tips:</h4>')
+            .replace(/\*\*Disclaimer:\*\*/g, '<div class="medical-disclaimer"><h4><i class="fas fa-info-circle"></i> Important Disclaimer:</h4>');
+    }
+    
+    // Apply markdown conversion
+    content = markdownToHtml(content);
+    
+    // Add AI assistant header
+    content = `<strong><i class="fas fa-robot"></i> MedSaathi AI Assistant:</strong><br><br>${content}`;
+    
+    return content;
+}
+
+// Updated addMessage function with markdown support
+function addMessage(message, isUser = false) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
+    
+    const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    // Format content with markdown support
+    const content = formatMessageContent(message, isUser);
+    
+    messageDiv.innerHTML = `
+        ${content}
+        <div class="message-timestamp">${timestamp}</div>
+    `;
+    
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+    </script>
+</body>
+</html>
